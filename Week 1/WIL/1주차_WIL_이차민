@@ -30,3 +30,45 @@ final이나 var 앞에 붙임
 compile-time constant
 컴파일할 때 알고있는 값
 사용자가 화면에서 입력해야하는 값은 const 불가
+
+#2.0 Basic Data Type
+String, bool, int, double
+Dart는 객체 지향 언어, object로 이루어짐/class
+num은 int일수도 double일수도 
+
+#2.1 Lists
+List numbers = [1,2,3,4];
+numbers.add(1);
+collection if
+collection for
+
+#2.2 String Interpolation
+text에 변수 추가
+$name
+${age+2}
+
+#2.3 Collection For
+for( var friend in oldfriends)
+
+#2.4 Maps
+key, value
+'name' : 'nico'
+object //any
+Map<int, bool> player = {};
+List<Map<String, Object>> players = [{},{},,,];
+
+#2.5 Sets
+var numbers = {1,2,3,4};
+Set unique item. 
+if numbers.add(1) not change
+sequence
+different from List
+
+#3.0 Defining a Function
+void sayHello(String name){"Hello"};
+void return nothing
+
+#3.1 Named Parameters
+
+소감
+Dart는 이번에 처음 해보는데 기초문법은 파이썬과 C와 비슷한 것 같다. 세부적으로 기억해야할 내용이 많아서 다시 한 번 공부를 해야할 것 같다. 
