@@ -150,10 +150,10 @@ class Player{
   
   Player(this.name, this.xp, this.team, this.age); //<- Positional argument
   Player({
-		required this.name,
-		required this.xp,
-		required this.team,
-		required this.age,}); //<- Named argument
+	required this.name,
+	required this.xp,
+	required this.team,
+	required this.age,}); //<- Named argument
   void sayHello() {
     print("Hi my name is $name");
   }
@@ -161,41 +161,11 @@ class Player{
 
 void main() {
   var player = Player(
-		name:'nico',
-		xp: 1500,
-		team: 'blue',
-		age: 21
-	);
-}
-```
-
-```dart
-class Player{
-  final String name;
-  int xp;
-	String team;
-	int age;
-  
-  Player(this.name, this.xp, this.team, this.age); //<- Positional argument
-
-  Player({
-		required this.name,
-		required this.xp,
-		required this.team,
-		required this.age,}); //<- Named argument
-
-  void sayHello() {
-    print("Hi my name is $name"); 
-  }
-}
-
-void main() {
-  var player = Player(
-		name:'nico',
-		xp: 1500,
-		team: 'blue',
-		age: 21
-	);
+	name:'nico',
+	xp: 1500,
+	team: 'blue',
+	age: 21
+  );
 }
 ```
 
@@ -212,19 +182,19 @@ class Player{
 	int age;
   
   Player({
-		required this.name,
-		required this.xp,
-		required this.team,
-		required this.age,}); //<- Named argument
+	required this.name,
+	required this.xp,
+	required this.team,
+	required this.age,}); //<- Named argument
   
-	// name parameter 형식 사용
+  // name parameter 형식 사용
   Player.createBluePlayer({required String name, required int age}):
     this.age = age,
     this.name = name,
     this.team = 'blue',
     this.xp = 0; 
   
-    // positional parameter 사용
+  // positional parameter 사용
   Player.createRedPlayer(String name, int age):
     this.age = age,
     this.name = name,
@@ -256,9 +226,9 @@ class Player{
 	String team;
   
   Player({
-		required this.name,
-		required this.xp,
-		required this.team}); //<- Named argument
+    required this.name,
+    required this.xp,
+    required this.team}); //<- Named argument
   
   void sayHello() {
     print("Hi my name is $name"); //this 를 사용할 순 있지만, class 내에서 사용하지 않는 것을 권장
