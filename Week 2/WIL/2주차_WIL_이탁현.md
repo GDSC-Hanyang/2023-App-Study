@@ -4,15 +4,15 @@
 
 ### 3.3 Optional Positional Parameters
 
-'Positional parameters' 은 'argument'를 위치에 맞게 보냄
-'named parameters' 은 'argument'를 'parameter'의 이름에 맞게 보냄
-상황에 따라 'Nullable'을 사용하여 'required'가 아닐 경우 'argument'로 받지 않음
+`Positional parameters` 은 `argument`를 위치에 맞게 보냄
+`named parameters` 은 `argument`를 `parameter`의 이름에 맞게 보냄
+상황에 따라 `Nullable`을 사용하여 `required`가 아닐 경우 `argument`로 받지 않음
 
 ### 3.4 QQ Operator
-'QQ' == '??" // Question Question Operator
-'''dart 
+`QQ` == `??` // Question Question Operator
+```dart 
 A??B 
-'''
+```
 에서 A가 Null이면 B를 호출하고 A가 Null이 아니면 A 호출함 
 'assign operator'은 값이 NULL일 때 다른 값 출력
 
