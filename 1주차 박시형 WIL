@@ -375,74 +375,20 @@ void main() {
    };
 }
 
-
---------------------------------------------------------------------------------------
- 'Map' 안에는 'Key'와 'Value'로 나누어져 있는 자료구조이다. 
- 
- ```dart
-  var player = {
-	'name': 'NaZe',
-	'xp': 19.99,
-	'superpower': false
-}; 
- ```
-'API'와 같은 구조에 쓰인다면 'Map'보다는 'Class'가 더 나을 것이다.
-
-#2.5 Sets
-
-```dart
-  List<Int> numbers1 = [1,2,2,3,4];
-  Set<Int> numbers2 = {1,2,3,4};
-  // 중괄호와 대괄호 차이. 
-  // Set은 각각 안의 값에 유니크함이 있어서 1을 계속 추가해도 1이라는 고유값 하나가 있기에 추가 되지않음.
- ```
+void main() {
+   Map <int, bool> player = {   // key는 숫자만 올 수 있고 value는 true 혹은 false만 적을 수 있다. int는 key의 자료형, bool은 value의 자료형 -> 컴파일러가 key와 value의 자료형을 유추할 것
+// 되게 복잡한 key 설정도 가능 key로 integer List, value로는 bool을 가지도록 설정 가능함
+// 어떤 key든 value든 명시해줄 수 있음. 모든 게 class에서 나오고 Dart에서는 모두 class이기 때문임.
+// Map도 마찬가지로 method와 property를 갖고 있음. player를 입력하면 entries, isEmpty 등 다양하고 keys, length, value도 가능 (예 player.length), containsKey의 경우 특정 요소가 포함되어있는지 아닌지 체크할 때 씀
+// 특정 key가 존재하지 않는다면 추가할 수도 있음
+      1: true
+      2: false
+      3: true
+};
+}
 
 
-
-Chapter 3 Functions
--------------
-
-
-'void'로 선언할 경우 그 함수는 리턴값이 없다.
-#3.0 Defining a Function
-
- ```dart
-   void sayHello(String name) {
-	print("Hello $name nice to meet you");
-  } //리턴 값은 없지만 실행을 돼서 'print'가 출력 됨
- ```
-
-#3.1 Named Parameters
-
-
-함수의 'parameters'에 이름을 붙여준다.
-
- 'required'을 사용하면 함수에 'parameter'가 필수로 들어감.
-  ```dart
-   String sayHello({String name = 'anon', int age = 99, String country = 'wakanda'}) {
-	return "Hello $name, you are $age, you're from $country"
-  }
-  void main() {
-	print(sayHello(
-		age: 12,
-		country: 'korea',
-		name: 'kongtaks'
-	));
- ```
-#3.2 Recap
-
-'Positional parameter'은 'Parameter'의 순서가 중요함, 필수 Parameters
-  
-'Parameter'의 위치를 기억하게.
-
-위 내용대로 
-
-'Named Parameters'에는 required로 함수에 필수로 들어가게 하는것. 
-
-'default' 지정해서 'null'오류 안 생기게 하는 것 잊지말기. 
-
-
-
+# 소감: 공지사항을 제대로 안 보고 저번 주 1주차 WIL을 작성하는 것을 깜빡헀는데 WIL 작성하면서 듣는 게 더 좋은 것 같습니다. 2주차에 1주차의 부분을 올렸는데 다음 WIL에 밀린 거 다 같이 올리도록 하겠습니다!
 
 
 
