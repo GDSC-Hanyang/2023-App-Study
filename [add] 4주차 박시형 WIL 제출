@@ -1171,7 +1171,103 @@ class MyLargeTitle extends StatelessWidget {
   }
 }
 
+-> 에러가 나옴
 
+수정사항 1번
+1. App 클래스와 _AppState 클래스:
+현재 State<App>를 반환하고 있습니다. 이것은 StatefulWidget의 제네릭 형태로 지정해야 합니다.
+App 클래스의 createState 메서드는 _AppState 클래스의 인스턴스를 반환해야 합니다.
+
+수정 후 
+class App extends StatefulWidget {
+  @override
+  _AppState createState() => _AppState();
+}
+
+수정사항 2번
+2. MyLargeTitle 위젯:
+현재 코드에서 MyLargeTitle 위젯이 렌더링되고 있지만 MyLargeTitle 위젯은 children 리스트에 있어야 합니다.
+Column 위젯의 children 리스트에 추가하세요.
+
+children: [
+  const MyLargeTitle(),
+],
+
+
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(App());
+}
+
+class App extends StatefulWidget {
+  @override
+  _AppState createState() => _AppState();
+}
+
+class _AppState extends State<App> {
+  List<int> numbers = [];
+
+  void onClicked() {
+    setState(() {
+      numbers.add(numbers.length);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      theme: ThemeData(
+        textTheme: const TextTheme(
+          titleLarge: TextStyle(
+            color: Colors.red,
+          ),
+        ),
+      ),
+      home: Scaffold(
+        backgroundColor: const Color(0xFFF4EDDB),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                'Click Count',
+                style: TextStyle(fontSize: 30),
+              ),
+              for (var n in numbers) Text('$n'),
+              IconButton(
+                iconSize: 40,
+                onPressed: onClicked,
+                icon: const Icon(
+                  Icons.add_box_rounded,
+                ),
+              ),
+              // MyLargeTitle widget 추가
+              const MyLargeTitle(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class MyLargeTitle extends StatelessWidget {
+  const MyLargeTitle({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      'My Large Title',
+      style: TextStyle(
+        fontSize: 30,
+        color: Theme.of(context).textTheme.titleLarge?.color,
+      ),
+    );
+  }
+}
 #4.4 Widget Lifecycle
 // StatefulWidget은 생명 주기(life cycle)를 가지고 있으며 이벤트에 반응한다.
 // StatefulWidget은 build 메서드 이외에 initState 메서드도 가지고 있음 (InitState는 상태를 초기화 하기 위한 메서드)
