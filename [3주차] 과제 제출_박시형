@@ -1,0 +1,66 @@
+3주차 과제
+mainAxisAligment 과 crossAxisAligment 는 Row 나 Column 에서 children 을 정렬하기 위해 사용합니다.
+
+mainAxisAligment 는 자식 widget을 주축에 따라 정렬하고, crossAxisAligment 는 자식 위젯을 주축에 수직으로 교차하는 교차 축을 따라 정렬합니다.
+
+## 1번 문제
+crossAxisAligment 는 start, end 과 같이 총 5개의 값을 가질 수 있는데, 각 값이 어떻게 작동하는지 찾아 작성해주세요. (강의 내용에 없어요!, 직접 구현해보거나 검색을 통해 찾아주세요. 직접 구현해보는 것이 제일 좋아요! 직접 구현한 사진도 넣어주시면 더 좋습니다.)
+
+### 1번 답변
+
+<!-- 여기 작성하시면 됩니다!-->
+
+mainAxisAligment는 주축(mainAxis)가 수평(가로)라는 뜻이라는 점에서 위젯을 가로 방향으로 정렬하는 데 사용되는 속성이다. 행(Row) 위젯 사용시, 주축(mainAxis)은 수평(가로)이며, 횡축(crossAxis)는 세로이다. 열(Column)위젯 사용시, 주축(mainAxis)은 수직(세로)이며, 횡축(crossAxis)는 가로이다.
+
+MainAxisAlignment.start: 자식 위젯을 가로 방향의 시작 부분에 정렬함. 시작 부분은 주로 왼쪽 (LTR - 왼쪽에서 오른쪽) 또는 오른쪽 (RTL - 오른쪽에서 왼쪽)에 해당함.
+
+MainAxisAlignment.end: 자식 위젯을 가로 방향의 끝 부분에 정렬. 끝 부분은 주로 오른쪽 (LTR) 또는 왼쪽 (RTL)에 해당
+
+MainAxisAlignment.center: 자식 위젯을 가로 방향의 중앙에 정렬
+
+MainAxisAlignment.spaceBetween: 자식 위젯 사이에 동일한 간격을 두며, 첫 번째와 마지막 위젯은 시작 및 끝 부분에 정렬됨.
+
+MainAxisAlignment.spaceAround: 자식 위젯 주위에 동일한 간격을 두며, 시작과 끝 부분에도 반 간격을 둠.
+
+MainAxisAlignment.spaceBetween: 자식 위젯을 가능한 한 큰 간격을 두며 시작과 끝 부분은 그에 맞게 정렬됨.
+
+MainAxisAlignment.spaceEvenly: 자식 위젯을 가능한 한 큰 간격을 두며, 모든 위젯 주위에 동일한 간격을 둠.
+
+(이미지 참고: https://velog.io/@steadygo247/FlutterRowColumn-%EC%A0%95%EB%A0%ACMainAxisAlignment-CrossAxisAlignment-%EC%A0%95%EB%A6%AC)
+
+## 2번 문제
+
+crossAxisAligment 는 start, end 과 같이 총 5개의 값을 가질 수 있는데, 각 값이 어떻게 작동하는지 찾아 작성해주세요. (강의 내용에 없어요!, 직접 구현해보거나 검색을 통해 찾아주세요. 직접 구현해보는 것이 제일 좋아요! 직접 구현한 사진도 넣어주시면 더 좋습니다.)
+
+### 2번 답변
+
+<!-- 여기 작성하시면 됩니다!-->
+
+CrossAxisAlignment는 횡축(crossAxis)가 세로라는 뜻이라는 점에서 위젯을 세로 방향으로 정렬하는 데 사용되는 속성이다. 행(Row) 위젯 사용시, 주축(mainAxis)은 수평(가로)이며, 횡축(crossAxis)는 세로이다. 열(Column)위젯 사용시, 주축(mainAxis)은 수직(세로)이며, 횡축(crossAxis)는 가로이다.
+
+CrossAxisAlignment.start: 자식 위젯을 교차 축의 시작 부분에 정렬한다. Column 내에서 자식 위젯을 가장 위에 정렬하거나 Row 내에서 자식 위젯을 가장 왼쪽에 정렬한다.
+
+CrossAxisAlignment.end: 자식 위젯을 교차 축의 끝 부분에 정렬한다. Column 내에서 자식 위젯을 가장 아래에 정렬하거나 Row 내에서 자식 위젯을 가장 오른쪽에 정렬한다.
+
+CrossAxisAlignment.center: 자식 위젯을 교차 축의 중앙에 정렬한다.
+
+CrossAxisAlignment.stretch: 자식 위젯을 교차 축에서 확장하여 부모 위젯과 같은 크기로 만든다. 이를 통해 교차 축에서 자식 위젯의 크기를 확장 가능하며 주로 Column 내에서 수직으로 전체 공간을 차지하거나 Row 내에서 수평으로 전체 공간을 차지하는 데 사용된다.
+
+CrossAxisAlignment.baseline: 자식 위젯을 텍스트 기준선과 맞춘다. (텍스트 요소가 있는 위젯을 다룰 때 유용함)
+
+(이미지 참고: https://velog.io/@steadygo247/FlutterRowColumn-%EC%A0%95%EB%A0%ACMainAxisAlignment-CrossAxisAlignment-%EC%A0%95%EB%A6%AC)
+
+
+## 3번 제출!
+3번 제출!
+강의 #3.0 부터 #3.5까지 따라오셨다면, 완성되는 파일이 있을거에요!
+
+자신이 작성한 flutter 파일의 lib 폴더를 github 자신의 이름에 해당하는 폴더에 upload 해주시면 됩니다
+
+자세한 방법은 하단의 링크를 참조해주세요
+
+https://github.com/GDSC-Hanyang/2023-App-Study/issues/4
+
+<!-- 여기 작성하시면 됩니다!-->
+
+![image](https://github.com/GDSC-Hanyang/2023-App-Study/assets/144704798/99ccad5d-adbe-4504-8144-52ac03bbdb43)
