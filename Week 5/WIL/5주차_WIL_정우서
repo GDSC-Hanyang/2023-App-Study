@@ -1,0 +1,789 @@
+# 5주차
+
+# POMODORO APP 만들기
+
+### flexible
+
+ui를 픽셀단위로 지정하는게 아닌 비율에 기반하도록 해줌 → 더욱 유연하게 제작 가능!
+
+```dart
+body: Column(
+        children: [
+          Flexible(
+            flex: 1,
+            child: Container(
+              decoration: const BoxDecoration(
+                color: Colors.red,
+              ),
+            ),
+          ),
+          Flexible(
+            flex: 2,
+            child: Container(
+              decoration: const BoxDecoration(
+                color: Colors.green,
+              ),
+            ),
+          ),
+          Flexible(
+            flex: 1,
+            child: Container(
+              decoration: const BoxDecoration(
+                color: Colors.blue,
+              ),
+            ),
+          ),
+        ],
+      ),
+```
+
+
+flex : 비율! (1이 기본값)
+
+→ 즉 3개의 box(container)가 열로 있는데, 비율을 다르게 설정하려면 flexible로 감싸면 되는것!
+
+### Timer
+
+dart 라이브러리에 있는것 → pomodoro에서 타이머 사용!
+
+```dart
+import 'dart:async';
+
+...
+
+class _HomeScreenState extends State<HomeScreen> {
+  int totalSeconds = 1500;
+  late Timer timer;
+```
+
+timer를 미리 만들어줘야함 → 나중에 초기화 할것이므로 late랑 같이쓰기
+
+Timer에 에러가 나서 ‘dart:async’를 추가해줬다.
+
+```dart
+timer = Timer.periodic(duration, (timer) {});
+```
+
+timer를 초기화
+
+1초마다 timer를 발생시킴 → 즉 일정 주기마다 발생시킬 때 사용하는게 periodic!
+
+duration(주기)마다 특정 동작 (두번째 인자부분)을 실행해준다
+
+```dart
+class _HomeScreenState extends State<HomeScreen> {
+  int totalSeconds = 1500;
+  late Timer timer;
+
+  void onTick(Timer timer) {
+    setState(() {
+      totalSeconds = totalSeconds - 1;
+    });
+  }
+
+  void onStartPressed() {
+    timer = Timer.periodic(const Duration(seconds: 1), onTick);
+  }
+.....
+```
+
+onStartPressed → 버튼 onpress에 사용
+
+timer → timer 초기화
+
+주기를 1초로 설정
+
+onTick함수를 실행 (이 때 여기 들어가는 함수는 인자로 Timer를 받음)
+
+onTIck함수에서 totalsecond를 1씩 감소!
+
+바뀌는 정보에 맞춰 다시 build하려고 setstate안에 넣어준다!
+
+### 버튼까지 완성
+
+
+```dart
+import 'package:flutter/material.dart';
+import 'dart:async';
+
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  int totalSeconds = 1500;
+  bool isRunning = false;
+  late Timer timer;
+
+  void onTick(Timer timer) {
+    setState(() {
+      totalSeconds = totalSeconds - 1;
+    });
+  }
+
+  void onStartPressed() {
+    timer = Timer.periodic(const Duration(seconds: 1), onTick);
+    setState(() {
+      isRunning = true;
+    });
+  }
+
+  void onPausePressed() {
+    timer.cancel();
+    setState(() {
+      isRunning = false;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.background,
+      body: Column(
+        children: [
+          Flexible(
+            flex: 1,
+            child: Container(
+              alignment: Alignment.bottomCenter,
+              child: Text(
+                '$totalSeconds',
+                style: TextStyle(
+                  color: Theme.of(context).cardColor,
+                  fontSize: 89,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+          Flexible(
+            flex: 3,
+            child: Center(
+              child: IconButton(
+                iconSize: 120,
+                color: Theme.of(context).cardColor,
+                onPressed: isRunning ? onPausePressed : onStartPressed,
+                icon: Icon(isRunning
+                    ? Icons.pause_circle_outline
+                    : Icons.play_circle_outline),
+              ),
+            ),
+          ),
+          Flexible(
+            flex: 1,
+            child: Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).cardColor,
+                      borderRadius: BorderRadius.circular(50),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Pomodoros',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
+                            color:
+                                Theme.of(context).textTheme.displayLarge!.color,
+                          ),
+                        ),
+                        Text(
+                          '0',
+                          style: TextStyle(
+                            fontSize: 58,
+                            fontWeight: FontWeight.w600,
+                            color:
+                                Theme.of(context).textTheme.displayLarge!.color,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+```
+
+isrunning을 추가해서 아이콘을 다르게 보여주도록 수정
+
+### date format
+
+기존에 그냥 seconds를 그대로 보여주지 말고, 25:00로 분단위로 보여주도록 수정
+
+```dart
+String format(int seconds) {
+    var duration = Duration(seconds: seconds);
+
+    return duration.toString().split(".").first.substring(2, 7);
+  }
+```
+
+duration으로 시:분:초.0000 string을 받아옴
+
+→ .000부분을 자르기 위해 split, first사용
+
+⇒ 시:분:초
+
+→ 시: 부분을 자르기 위해 substring사용
+
+⇒ 분:초
+
+
+### code challenge - reset버튼 추기
+
+
+```dart
+import 'package:flutter/material.dart';
+import 'dart:async';
+
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  static const twentyFiveMinutes = 1500;
+  int totalSeconds = twentyFiveMinutes;
+  bool isRunning = false;
+  int totalPomodoros = 0;
+  late Timer timer;
+
+  void onTick(Timer timer) {
+    if (totalSeconds == 0) {
+      setState(() {
+        totalPomodoros = totalPomodoros + 1;
+        isRunning = false;
+        totalSeconds = twentyFiveMinutes;
+      });
+      timer.cancel();
+    } else {
+      setState(() {
+        totalSeconds = totalSeconds - 1;
+      });
+    }
+  }
+
+  void onStartPressed() {
+    timer = Timer.periodic(const Duration(seconds: 1), onTick);
+    setState(() {
+      isRunning = true;
+    });
+  }
+
+  void onPausePressed() {
+    timer.cancel();
+    setState(() {
+      isRunning = false;
+    });
+  }
+
+  void onResetPressed() {
+    timer.cancel();
+    setState(() {
+      isRunning = false;
+      totalSeconds = twentyFiveMinutes;
+    });
+  }
+
+  String format(int seconds) {
+    var duration = Duration(seconds: seconds);
+
+    return duration.toString().split(".").first.substring(2, 7);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.background,
+      body: Column(
+        children: [
+          Flexible(
+            flex: 1,
+            child: Container(
+              alignment: Alignment.bottomCenter,
+              child: Text(
+                format(totalSeconds),
+                style: TextStyle(
+                  color: Theme.of(context).cardColor,
+                  fontSize: 89,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+          Flexible(
+            flex: 3,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Center(
+                  child: IconButton(
+                    iconSize: 120,
+                    color: Theme.of(context).cardColor,
+                    onPressed: isRunning ? onPausePressed : onStartPressed,
+                    icon: Icon(isRunning
+                        ? Icons.pause_circle_outline
+                        : Icons.play_circle_outline),
+                  ),
+                ),
+                Center(
+                  child: IconButton(
+                    onPressed: onResetPressed,
+                    icon: const Icon(Icons.restore_outlined),
+                  ),
+                )
+              ],
+            ),
+          ),
+          Flexible(
+            flex: 1,
+            child: Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).cardColor,
+                      borderRadius: BorderRadius.circular(50),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Pomodoros',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
+                            color:
+                                Theme.of(context).textTheme.displayLarge!.color,
+                          ),
+                        ),
+                        Text(
+                          '$totalPomodoros',
+                          style: TextStyle(
+                            fontSize: 58,
+                            fontWeight: FontWeight.w600,
+                            color:
+                                Theme.of(context).textTheme.displayLarge!.color,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+```
+
+# 웹툰 앱 만들기 ~6.8
+
+### api
+
+[https://webtoon-crawler.nomadcoders.workers.dev](https://webtoon-crawler.nomadcoders.workers.dev/)
+
+/today : 오늘의 웹툰
+
+/id : 해당 웹툰 정보
+
+/id/episodes : 해당 웹툰의 에피소드 정보
+
+### pub.dev
+
+[https://pub.dev](https://pub.dev/)
+
+dart, flutter 공식 패키지 보관소
+
+→ http라는 패키지를 다운받아서 사용한다
+
+### pubspec.yaml 파일
+
+프로젝트에 대한 정보를 담고있는 파일 → 아주 중요하다!
+
+이미지, 폰트설정 등등을 여기서 해줄 수 있다
+
+http패키지 설정도 여기서 할 수 있다
+
+'''dart
+dependencies: 
+  flutter:
+    sdk: flutter
+  http: ^0.13.5
+'''
+
+이렇게 적고 저장하면 자동으로 설치된다!
+
+## Data Fetching
+
+### http.get()
+
+```dart
+import 'package:http/http.dart' as http;
+...
+
+http.get(url);
+
+// Future<Response> get(Uri url, {Map<String, String>? headers})
+```
+
+get요청을 보내는것! 이 때 반환타입이 future타입 (미래에 완료될것)
+
+→ future타입 : 미래에 받을 결과값의 타입을 알려주는것
+
+→ <response>로 되어있으므로, 완료되었을 때 response라는 타입을 반환할것이라고 알려주는것
+
+### await
+
+```dart
+void getTodaysToons()async {
+    final url = Uri.parse('$baseUrl/$today');
+    await http.get(url);
+  }
+```
+
+http.get(url) → api요청을 보낸다음 기다릴 필요가 있음!! (데이터가 올때까지 기다리는것)
+
+이 때 dart가 그냥 다음라인으로 안넘어가고 기다리도록 만들어주는게 await!
+
+await는 async함수 내에서만 사용할 수 있다 (함수뒤에 async추가)
+
+```dart
+import 'package:http/http.dart' as http;
+
+class ApiService {
+  final String baseUrl = "https://webtoon-crawler.nomadcoders.workers.dev";
+  final String today = "today";
+
+  void getTodaysToons() async {
+    final url = Uri.parse('$baseUrl/$today');
+    final response = await http.get(url);
+    if (response.statusCode == 200) {
+      print(response.body);
+      return;
+    }
+    throw Error();
+  }
+}
+
+...
+
+//main.dart
+void main() {
+  ApiService().getTodaysToons();
+  runApp(const App());
+}
+```
+
+statuscode == 200 : 200이면 성공이란 뜻
+
+→ 성공일 때 body에 있는 내용 출력! (body에는 오늘의 웹툰에 대한 정보가 있을 것)
+
+
+### macos에서 에러가 뜨는 문제
+
+→ 시뮬레이터를 안드로이드로 하면 정상적으로 되지만, macos로 바꾸면 get에서 exception이 걸림
+
+→ [https://github.com/dart-lang/http/issues/808](https://github.com/dart-lang/http/issues/808) 댓글에 나온 방법으로 해결
+
+
+## fromJson
+
+위에 그냥 string으로 받아온 정보를 class로 이루어진 리스트로 만들기
+
+```dart
+class WebtoonModel {
+  final String title, thumb, id;
+
+  WebtoonModel.fromJson(Map<String, dynamic> json)
+      : title = json['title'],
+        thumb = json['thumb'],
+        id = json['id'];
+}
+
+...
+// api_sevice.dart
+
+Future<List<WebtoonModel>> getTodaysToons() async {
+    List<WebtoonModel> webtoonInstances = [];
+    final url = Uri.parse('$baseUrl/$today');
+    final response = await http.get(url);
+    if (response.statusCode == 200) {
+      final List<dynamic> webtoons = jsonDecode(response.body);
+      for (var webtoon in webtoons) {
+        webtoonInstances.add(WebtoonModel.fromJson(webtoon));
+      }
+      return webtoonInstances;
+    }
+    throw Error();
+  }
+```
+
+함수가 async함수면 리턴타입은 Future타입이어야함
+
+jsonDecode(response.body) : string으로 된걸 json으로 만들어주기
+
+→ 리턴값이 dynamic임!
+
+final List<dynamic> webtoons = jsonDecode(response.body); : 모양이 리스트니까 무언가가 dynamic이 들어있는 리스트로 만들기
+
+→ {}단위가 들어있는 리스트가 될것
+
+→ 리스트이므로 for문으로 하나씩 가져오기 가능
+
+`{"id":"814543","title":"너는 그냥 개그만화나 그려라","thumb":"https://image-comic.pstatic.net/webtoon/814543/thumbnail/thumbnail_IMAG21_b9d0083f-ced5-4ba8-ac33-c685b96d611a.jpg"}`
+
+중괄호 하나는 이렇게 id, title, thumb를 가지고 있고 이걸로 class만들기
+
+→ 그렇게 만든 class가 webtoonmodel!! (멤버로 id, title, thumb를 가짐)
+
+이 중괄호 모양또한 map이므로, named constructor를 이용해 class로 만들어줌
+
+⇒ 이렇게 만든 웹툰 리스트 (webtooninstances)를 리턴해준다 
+
+## 데이터 불러오기
+
+### 방법1 : waitforwebtoons (stateful)
+
+```dart
+class _HomeScreenState extends State<HomeScreen> {
+  List<WebtoonModel> webtoons = [];
+  bool isLoading = true;
+
+  void waitForWebToons() async {
+    webtoons = await ApiService.getTodaysToons();
+    isLoading = false;
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    waitForWebToons();
+  }
+...
+```
+
+→ init에서 webtoon을 불러오는 함수 call
+
+→ getTodayToons는 async함수이므로, 이 함수 호출 또한 await할 필요가 있음!
+
+그래서 waitForWebToons함수를 새로 만들어서 넣어준것
+
+→ setState를 해주면, 로딩이 끝나는것!
+
+⇒ 설정할게 많아서 실수가 생길 수 있음
+
+⇒ state를 사용해야함 (state는 최대한 안쓰는게 좋은방법이래)
+
+### 방법2 : FutureBuilder (stateless)
+
+```dart
+class HomeScreen extends StatelessWidget {
+  HomeScreen({super.key});
+
+  Future<List<WebtoonModel>> webtoons = ApiService.getTodaysToons();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        centerTitle: true,
+        elevation: 2,
+        foregroundColor: Colors.green,
+        backgroundColor: Colors.white,
+        title: const Text(
+          "오늘의 웹툰",
+          style: TextStyle(
+            fontSize: 24,
+          ),
+        ),
+      ),
+      body: FutureBuilder(
+        future: webtoons,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return const Text("There is data!");
+          }
+          return const Text("Loading....");
+        },
+      ),
+    );
+  }
+}
+```
+
+그냥 webtoons에 바로 가져오기 → await를 안했으므로, 그냥 저기만 보면 안기다려줌!!
+
+⇒ FutureBuilder 위젯을 사용한다
+
+여기에 future를 넣어주면, 알아서 기다려줌!
+
+snapshot을 이용해 지금 로딩중인지, 다 읽었는지 상태 확인도 가능하다
+
+
+⇒ future builder를 사용하자
+
+## ListView
+
+```dart
+body: FutureBuilder(
+        future: webtoons,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemCount: snapshot.data!.length,
+              itemBuilder: (context, index) {
+                var webtoon = snapshot.data![index];
+                return Text(webtoon.title);
+              },
+              separatorBuilder: (context, index) => const SizedBox(
+                width: 20,
+              ),
+            );
+          }
+```
+
+리스트로 보여주는 위젯! row, column으로 하나하나 보여주기 힘들 때 사용할 수 있다
+
+separated로 만들면, 리스트를 보여줄 때 한번에 모든 데이터를 가져오는게 아닌, 당장 눈에 보여줄것만 로딩할 수 있다 → 지금 필요하지 않는 부분은 로딩하지 않는것
+
+itemBuilder가 눈에 보이는것만 로딩하는함수 (index로 구분한다)
+
+내가 가져온 webtoon리스트를 index로 보여주면 되는것
+
+separatorbuilder는 리스트 아이템 사이에 구분 위젯을 넣어주는것 
+
+## Webtoon Card
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:toonflix/models/webtoon_model.dart';
+import 'package:toonflix/services/api_service.dart';
+
+class HomeScreen extends StatelessWidget {
+  HomeScreen({super.key});
+
+  final Future<List<WebtoonModel>> webtoons = ApiService.getTodaysToons();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        centerTitle: true,
+        elevation: 2,
+        foregroundColor: Colors.green,
+        backgroundColor: Colors.white,
+        title: const Text(
+          "오늘의 웹툰",
+          style: TextStyle(
+            fontSize: 24,
+          ),
+        ),
+      ),
+      body: FutureBuilder(
+        future: webtoons,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return Column(
+              children: [
+                const SizedBox(
+                  height: 50,
+                ),
+                Expanded(child: makeList(snapshot)),
+              ],
+            );
+          }
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        },
+      ),
+    );
+  }
+
+  ListView makeList(AsyncSnapshot<List<WebtoonModel>> snapshot) {
+    return ListView.separated(
+      scrollDirection: Axis.horizontal,
+      itemCount: snapshot.data!.length,
+      padding: const EdgeInsets.symmetric(
+        vertical: 10,
+        horizontal: 20,
+      ),
+      itemBuilder: (context, index) {
+        var webtoon = snapshot.data![index];
+        return Column(
+          children: [
+            Container(
+              width: 250,
+              clipBehavior: Clip.hardEdge,
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15),
+                  boxShadow: [
+                    BoxShadow(
+                      blurRadius: 15,
+                      offset: const Offset(10, 10),
+                      color: Colors.black.withOpacity(0.5),
+                    )
+                  ]),
+              child: Image.network(webtoon.thumb),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Text(
+              webtoon.title,
+              style: const TextStyle(
+                fontSize: 22,
+              ),
+            ),
+          ],
+        );
+      },
+      separatorBuilder: (context, index) => const SizedBox(
+        width: 40,
+      ),
+    );
+  }
+}
+```
+
+listview를 따로 함수로 구분해줌
+
+→ column에 넣을 때, listview는 height가 무한대여서 에러가 생긴다!! expanded로 감싸주면 해결
+
+→ 리스트 내에 사진과 제목을 같이 보여주기 위해 column사용
+
+→ 이미지 사이즈를 조절하고, 그림자를 넣는 등 꾸며주기 위해 컨테이너 안에 넣어줌
+
+## image.network(src)
+
+src에 있는 이미지를 보여주는 위젯!
+
+(src에 링크를 넣어주면 된다)
+
+실행할 때 403에러가 생김
+
+→ [https://gist.github.com/preinpost/941efd33dff90d9f8c7a208da40c18a9](https://gist.github.com/preinpost/941efd33dff90d9f8c7a208da40c18a9)
+
+두번째 방법 그대로 복사붙여넣기 하니까 해결됐다
