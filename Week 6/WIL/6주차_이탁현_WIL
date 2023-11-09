@@ -10,4 +10,4 @@ flutter pub -> 패키지 매니저로 pub을 통해 url_launcher, shared prefere
 
 
 
-// 소감 : StatefulWidget은 신이라고 생각한다 class로 대부분의 것을 만들 수 있다는 것에 감사한다. flutter의 매력을 잘 느꼈다.
+// 소감 :  class로 대부분의 것을 만들 수 있다니 확실히 사용자 친화적인 flutter의 매력이 느껴졌다.
