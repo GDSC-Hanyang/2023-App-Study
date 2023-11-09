@@ -1,0 +1,13 @@
+GestureDetector -> 모든 제스처를 감지한다 .. OnTap 사용자가 탭을 하면 발생한다 up down 으로 스크롤 가능
+
+Navigator -> detailscreenwidget을 화면 위로 올려줌
+
+Hero -> container 를 감싸면 애니메이션등을 통해 단조로운 디자인을 좋게 바꾸기 가능
+
+url_launcher -> flutter에서  http 를 열게 해줌
+
+flutter pub -> 패키지 매니저로 pub을 통해 url_launcher, shared preference 등 필요한 패키지를 불러 올 수 있음.
+
+
+
+// 소감 : StatefulWidget은 신이라고 생각한다 class로 대부분의 것을 만들 수 있다는 것에 감사한다. flutter의 매력을 잘 느꼈다.
