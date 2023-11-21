@@ -1,0 +1,3850 @@
+#6 WEBTOON APP
+## 6.9 Detail Screen
+
+// 1. 카드를 클릭하면 웹툰의 상세페이지로 가게 할 것임 -> widgets 이름의 새로운 폴더를 만들기, 폴더에 webtoon_widget.dart 만듦
+ -> StatelessWidget 하나 만들기, 이름: Webtoon -> Webtoon은 모든 걸 리턴할 것임 -> 복사+붙여넣기 -> Text를 import 해주기
+// 2. 문제: thumb과 title이 필요 -> webtoon을 받아와야 함(두 개만 따로 받아올 수도 있고 아니면 webtoon 전체를 받아올 수도 있음)
+-> title, thumb, ID라는 final String을 받는다고 적기 -> HomeScreen 닫기 
+// 3. ListView.separated를 만들기 -> 그 안에 있는 컴포넌트, 위젯 자체는 분리 -> 세 개의 속성을 전달받는 클래스(요구되는 건 title, thumb, ID)
+// 4. 누군가가 웹툰을 탭했을 때 사용자를 그 페이지로 보낼 수 있도록 이벤트의 발생을 감지 -> GestureDetector를 쓴다(Column에서
+shortcuts 누른 뒤 Wrap with widget을 선택 -> GestureDetector는 대부분의 동작을 감지(감지할 수 있는 동작이 많음: onTapCancel, onTop, 
+onTopUp, onTopDown, onLongPress, onTertiaryLongPress, onVerticalDrag, onHorizontalDrag, onScale, onPan) -> onTap은 버튼을 탭했을 때 
+발생하는 이벤트, onTapUp과 onTapDown의 조합 -> onTapDown은 손가락이 내려왔다, onTapUp은 손가락을 들었다는 걸 의미 -> 이 이벤트들이
+ 일어났다면 유저가 버튼을 클릭했다 -> onTap에 함수를 등록 -> 저장, 새로고침 -> debug console을 열고 탭하면 우리의 동작을 등록하고 있다
+// 5. 유저를 다른 화면으로 보내기 전에 먼저 새로운 화면을 만들어야 함 -> detail_screen.dart 이름의 새 파일 만들기 ->여기에 StatelessWidget
+을 만들고 이름은 DetailScreen(네비게이션 바가 있는 Scaffold 덕에 조금 더 Screen 처럼 보일 테지만 이건 그냥 StatelssWidget) 
+-> 물론 StatefulWidget도 될 수 있지만 그냥 위젯이다, 중요한 건 화면의 위젯을 전환하는 애니메이션 효과랑 네비게이션 바이다
+->  유저가 이 웹툰을 클릭하면 유저를 DetailScreen으로 보내고 싶다 -> 어떤 웹툰을 클릭했는지 알아야 DetailScreen이 해당 웹툰의 정보를
+ 보여줄 수 있다 -> Webtoon component에서 했던 것과 마찬가지로 필요한 정보를 넣어줌(ID, 제목, 표지 이미지는 DetailScreen에서도 똑같이
+ 필요함) -> 스크린이 단순한 위젯인데 어떻게 스크린을 바꿀 수 있을까? -> Navigator를 이용함,  Navigator는 route를 푸시 가능.
+-> Navigator는 context 정보가 필요, route가 필요 -> route는 DetailScreen 같은 위젯과는 다르다, route는 DetailScreen 같은 
+StatelessWidget을 애니메이션 효과로 감싸서 스크린처럼 보이도록 하겠다는 것임 -> 여기에 그냥 DetailScreen을 쓸 수는 없다 (왜?
+Navigator.push는 StatelessWidget을 원하지 않아서, Navigator.push가 원하는 건 route) -> route를 만듦. -> MaterialPageRoute는 또 다른 클래스
+-> StatelessWidget을 route로 감싸서 다른 스크린처럼 보이게 만든다 -> builder(route를 만드는 함수)에 단축 문법을 사용하고 DetailScreen 넣기
+// 6. 먼저 Navigator로 새 route를 push 중 -> route는 MaterialPageRoute로 만듦 -> 그 route는 StatelessWidget일 뿐인 DetailScreen을 렌더링 함
+-> DetailScreen을 테스트 하기 전에 scaffold를 렌더해야 함 -> HomeScreen을 떠날 거라서, scaffold를 렌더해야 함 -> 네비게이션 바는 
+HomeScreen에 속해 있는데 잃게 될 것임르ㅗ scaffold를 다시 그려줘야 함(AppBar를 복사 후 scaffold를 리턴)
+// 7. '오늘의 웹툰'이라는 텍스트를 보여주는 것 대신에 받아 온 웹툰의 제목을 보여줘야 함 -> const는 안 씀(이제는 불변값이 아님)
+// 8. 결과: Navigator.push가 StatelessWidget을 스크린처럼 보이게 만들고 있다. -> GestureDetector를 탭하기만 하면 새로운 
+MaterialPageRoute를 만들 수 있다 -> DetailScreen 위젯을 만들고 제목을 보냄 -> 제목을 받으면 그 제목을 AppBar에서 보여준다
+-> 웹툰 제목이 있는 이유
+// 9. body를 렌더한다(지금은 그냥 scaffold만 렌더하고 있고 HomeScreen도 scaffold를 렌더했음) -> Navigator.push를 사용하면 
+애니메이션 효과를 이용해서 유저가 다른 페이지로 왔다고 느끼게 해줄 수 있다 -> 실제: 또 다른 StatelessWidget을 렌더했을 뿐
+-> body 안에 Column을 만들기 ->  Column은 SizedBox를 자식으로 가진다 -> 컨테이너를 복사 붙여넣기 한다 -> 
+Container에서 const를 지운다
+// 10. 포스터를 중앙에 배치하고 싶다 -> 컨테이너로 돌아와서 여길 Row로 감싼다
+// 11. 옆에서부터 카드 이미지를 가져오고 싶지 않고 이미지를 바닥에서부터 가져오고 싶다 -> Navigator.push와 MaterialPageRoute를 사용할 때
+옵션 전달 가능 -> 예를 들면 fullscreenDialogue -> 바닥으로부터 이미지가 나오고 아이콘도 바뀐다. 얼마나 멋지니?
+->  Flutter는 이미지가 카드라는 걸 알고 있어서 아이콘이 이거다
+// 12. 아이콘은 여기 이 색깔을 반영한다
+// 13.  fullscreenDialogue 옵션을 설정하면 이미지는 바닥에서 온다 + 돌아가는 버튼은 X가 된다.
+
+1번 파일 lib/screens/detail_screen.dart
+import 'package:flutter/material.dart';
+
+class DetailScreen extends StatelessWidget {
+  final String title, thumb, id;
+  const DetailScreen({
+    super.key,
+    required this.title,
+    required this.thumb,
+    required this.id,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        elevation: 2,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.green,
+        title: Text(
+          title,
+          style: const TextStyle(
+            fontSize: 24,
+          ),
+        ),
+      ),
+      body: Column(
+        children: [
+          const SizedBox(
+            height: 50,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 250,
+                clipBehavior: Clip.hardEdge,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15),
+                  boxShadow: [
+                    BoxShadow(
+                      blurRadius: 15,
+                      offset: const Offset(10, 10),
+                      color: Colors.black.withOpacity(0.3),
+                    )
+                  ],
+                ),
+                child: Image.network(thumb),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+2번 파일 lib/screens/home_screen.dart
+
+import 'package:flutter/material.dart';
+import 'package:toonflix/models/webtoon_model.dart';
+import 'package:toonflix/services/api_service.dart';
+import 'package:toonflix/widgets/webtoon_widget.dart';
+
+class HomeScreen extends StatelessWidget {
+  HomeScreen({super.key});
+  final Future<List<WebtoonModel>> webtoons = ApiService.getTodaysToons();
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        elevation: 2,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.green,
+        title: const Text(
+          "어늘의 웹툰",
+          style: TextStyle(
+            fontSize: 24,
+          ),
+        ),
+      ),
+      body: FutureBuilder(
+        future: webtoons,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return Column(
+              children: [
+                const SizedBox(
+                  height: 50,
+                ),
+                Expanded(child: makeList(snapshot))
+              ],
+            );
+          }
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        },
+      ),
+    );
+  }
+  ListView makeList(AsyncSnapshot<List<WebtoonModel>> snapshot) {
+    return ListView.separated(
+      scrollDirection: Axis.horizontal,
+      itemCount: snapshot.data!.length,
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+      itemBuilder: (context, index) {
+        var webtoon = snapshot.data![index];
+        return Column(
+          children: [
+            Container(
+              width: 250,
+              clipBehavior: Clip.hardEdge,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15),
+                boxShadow: [
+                  BoxShadow(
+                    blurRadius: 15,
+                    offset: const Offset(10, 10),
+                    color: Colors.black.withOpacity(0.3),
+                  )
+                ],
+              ),
+              child: Image.network(webtoon.thumb),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Text(
+              webtoon.title,
+              style: const TextStyle(
+                fontSize: 22,
+              ),
+            ),
+          ],
+        return Webtoon(
+          title: webtoon.title,
+          thumb: webtoon.thumb,
+          id: webtoon.id,
+        );
+      },
+      separatorBuilder: (context, index) => const SizedBox(width: 40),
+    );
+  }
+}
+
+
+3번 파일 lib/widgets/webtoon_widget.dart
+import 'package:flutter/material.dart';
+import 'package:toonflix/screens/detail_screen.dart';
+
+class Webtoon extends StatelessWidget {
+  final String title, thumb, id;
+
+  const Webtoon({
+    super.key,
+    required this.title,
+    required this.thumb,
+    required this.id,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DetailScreen(
+              title: title,
+              thumb: thumb,
+              id: id,
+            ),
+            fullscreenDialog: true,
+          ),
+        );
+      },
+      child: Column(
+        children: [
+          Container(
+            width: 250,
+            clipBehavior: Clip.hardEdge,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(15),
+              boxShadow: [
+                BoxShadow(
+                  blurRadius: 15,
+                  offset: const Offset(10, 10),
+                  color: Colors.black.withOpacity(0.3),
+                )
+              ],
+            ),
+            child: Image.network(thumb),
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 22,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+## 6.10 Hero
+// 1. 지금까지 한 것의 결과 : 미리 셋업해야될 게 아무것도 없다 -> 가만히 있기만 하면 된다 -> navigator만 호출해주면 애니메이션이 
+알아서 나타나고 아이콘도 알아서 바뀐다
+// 2. Hero widget은 화면을 전환할 때 굉장히 멋진 애니메이션을 제공한다 -> 만약 강아지 머리를 탭하면 새로운 화면으로 덮이게 되는데
+이때 새 이미지를 사용함 -> 그런데 두 개가 사실 같은 이미지임 -> 원래 이미지를 덮어버리는 게 아니라 원래 이미지가 움직이면 멋질 것이다
+-> 화면을 덮어 버리는 대신 이 포스터를 움직인다 -> 포스터를 이 화면의 중간까지 움직이게 해서 마치 같은 포스터인 것처럼 보이게 하는 것
+-> Hero widget을 사용해서 쉽게 구현 가능
+// 3. Hero widget을 사용하는 방법: Hero widget을 두 개의 화면에 각각 사용하고 각각의 위젯에 같은 태그를 준다
+-> 마우스를 이미지와 그림자가 있는 카드의 Container 위에 올려준다 -> Column말고 width 값이 250인 Container에만 올려줄 것임
+-> 마우스를 올려서 action을 연다 -> Wrap with widget을 눌러주고 Hero 위젯으로 감싼다 
+-> Hero는 tag를 달아줘야 하므로 웹툰의 ID로 태그를 달아준다
+-> ID를 복사해서 붙여넣기 해주면 끝
+// 4. Webtoon widget은 이름이랑 포스터가 있는 카드인데 우리가 Hero로 감싸고 있는 건 포스터 부분만이다 
+-> 첫 번째 페이지를 보면 한 화면에 widget의 ID를 태그로 가진 Hero를 만들었음을 알 수 있음
+-> 이제 반대편 화면이 될 detail screen으로 건너가본다 -> SizedBox랑 포스터가 한 가운데 위치한 또 다른 Container를 렌더링
+-> 마찬가지로 Hero로 감싸준다 -> 이 widget을 Hero로 감싸주고 Webtoon의 ID를 태그로 입력해줄 것임
+-> Navigator.push를 이용해서 사용자를 DetailScreen으로 보낼 때 Webtoon의 ID도 함께 보낸다
+-> DetailScreen은 title, thumb, id을 갖게 될 것임
+// 5. 실행 -> 새로고침 -> 첫 번째 웹툰의 거의 끝까지 이동했다 -> 클릭전체에 적용됨 -> 이전에는 하나의 화면이 포스터를 덮어씌우는 거 같았으나 지금은 포스터가 떠다닌다
+-> 우리는 widget의 Container에 Hero로 Container에 표시만 남겨주면 된다 + 다른 페이지에도 Hero를 추가해주고 같은 tag가 있으면 그걸로 끝 -> 알아서 동작
+// 6. 이 부분을 지워도 애니메이션은 그대로 -> 화면이 옆으로 이동 -> 클릭하면 더 길게 이동하지 -> 우리는 단순히 같은 tag를 주기만 하면 끝
+
+1번 파일 lib/screens/detail_screen.dart
+import 'package:flutter/material.dart';
+class DetailScreen extends StatelessWidget {
+  final String title, thumb, id;
+  const DetailScreen({
+    super.key,
+    required this.title,
+    required this.thumb,
+    required this.id,
+  });
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        elevation: 2,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.green,
+        title: Text(
+          title,
+          style: const TextStyle(
+            fontSize: 24,
+          ),
+        ),
+      ),
+      body: Column(
+        children: [
+          const SizedBox(
+            height: 50,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 250,
+                clipBehavior: Clip.hardEdge,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15),
+                  boxShadow: [
+                    BoxShadow(
+                      blurRadius: 15,
+                      offset: const Offset(10, 10),
+                      color: Colors.black.withOpacity(0.3),
+                    )
+                  ],
+              Hero(
+                tag: id,
+                child: Container(
+                  width: 250,
+                  clipBehavior: Clip.hardEdge,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15),
+                    boxShadow: [
+                      BoxShadow(
+                        blurRadius: 15,
+                        offset: const Offset(10, 10),
+                        color: Colors.black.withOpacity(0.3),
+                      )
+                    ],
+                  ),
+                  child: Image.network(thumb),
+                ),
+                child: Image.network(thumb),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+2번 파일  
+lib/widgets/webtoon_widget.dart
+import 'package:flutter/material.dart';
+import 'package:toonflix/screens/detail_screen.dart';
+class Webtoon extends StatelessWidget {
+  final String title, thumb, id;
+  const Webtoon({
+    super.key,
+    required this.title,
+    required this.thumb,
+    required this.id,
+  });
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DetailScreen(
+              title: title,
+              thumb: thumb,
+              id: id,
+            ),
+            fullscreenDialog: true,
+          ),
+        );
+      },
+      child: Column(
+        children: [
+          Container(
+            width: 250,
+            clipBehavior: Clip.hardEdge,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(15),
+              boxShadow: [
+                BoxShadow(
+                  blurRadius: 15,
+                  offset: const Offset(10, 10),
+                  color: Colors.black.withOpacity(0.3),
+                )
+              ],
+          Hero(
+            tag: id,
+            child: Container(
+              width: 250,
+              clipBehavior: Clip.hardEdge,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15),
+                boxShadow: [
+                  BoxShadow(
+                    blurRadius: 15,
+                    offset: const Offset(10, 10),
+                    color: Colors.black.withOpacity(0.3),
+                  )
+                ],
+              ),
+              child: Image.network(thumb),
+            ),
+            child: Image.network(thumb),
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 22,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+
+## 6.11 Recap 
+// 1. 홈페이지에는 ListView를 만들어서 Webtoon이라는 widget을 렌더링하고 있다 -> 이 widget은 커버(포스터)를 가지고 있고 텍스트(타이틀)을 가지고 있다
+// 2. Webtoon은 포스터가 포함된 Column 그리고 BoxShadow, SizedBox 그리고 Text를 렌더링한다(굉장히 간단한 stateless widget)
+-> 모든 요소를 감싼 gesture detector를 이용해서 탭, 마우스 이동, 드래그, 줌 등을 감지 가능 -> 우리가 감지하려는 건 탭 동작 -> 사용자가 Webtoon widget에 탭을 누르면 Navigator.push()를 사용할 것임 -> Navigator는 class -> 이것도 StatefulWidget이다 -> 이 Navigator는 우리가 만든 DetailScreen widget을 지금 보는 Home 화면의 위에 올려줌(MaterialPageRoute를 사용하기에 가능하다) -> MaterialPageRoute는 이 모든 애니메이션을 생성함(스크린을 맨 위에 나타나게 할 수도 있고 x를 눌러서 자동으로 뒤로 갈 수도 있다 -> 이게 MaterialPageRoute를 사용하는 이유) -> 하지만 실제 동작을 살펴보면 Detail Screen widget을 띄우고 있을 뿐이다 -> Detail Screen widget은 Scaffold를 렌더링하는데 이게 AppBar를 렌더링하고 있다(Detail Screen을 생성할 때 생성하려는 웹툰의 title, thumb, id를 전달하고 있다 -> 클릭했을 때 바로 title에 접근할 수 있는 이유)
+-> 따로 웹에서 title을 가져올 필요도 포스터를 가져올 필요도 없다(class properties를 통해 전달했기 때문)
+// 2번 정리: 우리가 지금 애니메이션 효과를 이용해서 사용자가 다른 화면으로 간다고 느끼게 만든다는 것을 기억하자 -> 사실은 새로운 stateless widget을 렌더링하는 것 뿐임 -> 하지만 MaterialPageRoute를 사용해서 훨씬 더 근사해보이고 앞 뒤로 이동할 수 있는 버튼들도 있다 -> 아래에서 떠오르는 애니메이션도 있고 측면에서 시작되는 애니메이션도 있다
+-> 이 애니메이션은 Hero를 통해 만들어진 animation임 -> Hero는 두 화면 사이에 애니메이션을 주는 component(홈 스크린에 있는 Webtoon widget에 적용했었음)
+-> 이 홈스크린에서 이미지와 그림자가 있는 Container를 Hero로 감싸줌 -> 그리고 이 Hero에 tag를 부여함 -> 유니크한 tag -> 여기서는 Webtoon의 ID
+-> Detail Screen으로 이동하면 그림자와 이미자가 있는 또 다른 Container가 있는데 해당 Container를 Hero로 감싸고 사용자가 클릭한 Webtoon의 ID를 전달해주는 것
+-> 이 ID는 아까랑 똑같은 ID가 됨(같은 ID를 입력해서 연결시키는 것) -> 단순히 두 개의 Hero에 같은 ID를 부여하면 Flutter는 여러 화면에 걸쳐 애니메이션을 넣으려는 걸 안다
+-> 요소를 클릭했을 때, 사라지는 게 아니라 새로운 지점으로 떠가는 것처럼 보이는 것
+
+
+## 6.12 ApiService
+// 1. 오늘 할 것: URL을 fetch -> API URL에 Webtoon의 ID를 붙인 건데 이를 통해 해당 Webtoon에 대한 정보를 얻을 수 있다
+// 2. 방법: static method를 하나 만듦 -> Future를 받아서 이전처럼 Webtoon을 return하지 않음 -> WebtoonModel에는 title, thumbnail, ID 뿐인데 이번에는 title, about, genre, age, thumb으로 이루어져 있어서 다르다 -> 새 모델 만들기 -> webtoon_detail_model.dart이라는 파일을 만들고 WebtoonDetailModel 이라는 class를 하나 만들고 property들을 정의
+-> title, about, genre, age 자료형은 String이고 title, about, genre 그리고 age를 적어주면 끝 -> fromJson constructor를 정의해줌
+-> String key와 danymic value의 Map을 받는다 -> title에 값을 넣어주면 됨 -> about에도 값을 넣어주고 age에도 넣어주기 -> genre도 마찬가지
+// 3. 사용법: static method는 WebtoonDetailModel을 return할 것이다 -> 이 method의 이름은 getTodaysToons니까 getToonById 라고 붙임
+-> ID는 String 타입일 거고 asynchronous method가 됨 -> 키우고 URL parse 해줌 -> baseUrl을 적어주고 슬래시 -> 원하는 Webtoon의 ID를 적어줌 -> response를 받아옴
+-> http.get(url)을 await 해야함 -> response.statusCode가 200이면 잘 된 거고 아니면 error를 throw할 것임 -> Json body를 decode 하지 않고 단순한 String 형태인 response.body를 decode함 -> webtoon이 생겼으니 이제 json으로 새 WebtoonDetailModel을 생성함 -> WebtoonDetailModel.fromJson()이라 적어주고 webtoon을 전달해 주면 됨 -> return 해줌
+// 4. 정리: 먼저 URL을 만들었다 -> 해당 URL로 request를 보내고 request가 성공적이었다면 String 타입인 response.body를 받아다가 json으로 바꿔줌 -> 우리는 json을 constructor로 전달함 -> WebtoonDetailModel은 json을 받아서 title에 json의 title 값을 할당하고 다른 property들에도 동일하게 적용함 -> webtoon의 에피소드들도 fetch 해줘야 함 -> episodes라 적어주기 -> 최근 에피소드의 정보를 받아올 수 있다
+// 5. 방법: models 폴더 안에 webtoon_episode_model.dart라는 파일을 만듦 -> WebtoonEpisodeModel class를 만듦 -> 에피소드는 굉장히 단순(id, title, rating, date를 가지고 있고
+thumbnail은 사용하지 않음 -> id, title, rating, date만 있으면 됨) -> fromJson을 생성하는 방법: id를 json의 id로 초기화해주고 title이랑 rating도 똑같이 해 준다(지루하고 실수하기도 쉽다) -> date에 json의 date 값을 부여해준다 -> WebtoonEpisodeModel 이라는 새로운 class를 생성했고 json Map으로 class를 초기화할 생성자도 만들었다
+// 6. service method 만들기: 복사 붙여넣기 -> getLatestEpisodes라 적고 ById도 붙여줌(여전히 Webtoon의 ID가 필요하기 때문) -> 여기에 episodes도 붙여줌 -> 이러면 에피소드 리스트를 받아오게 될 것임 -> 한 두 개가 아니므로 우리가 해야할 건 webtoon 대신에 episodes로 이름을 바꿔주는 것 -> for을 적어주고episodes의 각각의 episode들마다 WebtoonEpisodeModel을 만들어줄 것임 ->  WebtoonEpisodeModel.fromJson()을 입력해주고 episode를 json의 형태로 전달해줌 -> List가 돼야 하기 때문에 List를 하나 만들어야 함(최신 에피소드들을 받아와야 하기 때문에 List 형태) -> instances 라고 불러줌 -> method의 반환형은 WebtoonEpisodeModel의 List를 return해야 함 -> 그러면 우리가 새로운 WebtoonEpisodeModel을 생성할 때마다 episodesInstances.add()라 적어주고 추가함 -> 마지막으로 episodesInstances를 return 해줌
+// 7. 6번 정리: model을 만들었다 -> field가 몇 개 있는 평범한 class야 -> json으로 초기화 -> 여기 이렇게 두 개의 method를 만들었다 -> 하나는 ID로 webtoon을 한 개 받아오는 method
+-> 그래서 baseUrl과 id를 가지고 request를 보냈다 -> 서버로부터 받은 json을 가지고 model을 만들었다 -> 다른 method는 ID값에 따른 최신 에피소드 리스트를 받아옴 -> 이건 아주 긴 List를 반환해줌 -> 이 에피소드들을 json으로 decode하고 각각의 json 에피소드마다 새로운 WebtoonEpisodeModel을 생성했다(마찬가지로 평범한 class) -> 이 model들의 instance들을 instance List에 담아준다 -> 선언 후 return해주면 끝
+
+1번 파일
+lib/models/webtoon_detail_model.dart
+class WebtoonDetailModel {
+  final String title, about, genre, age;
+
+  WebtoonDetailModel.fromJson(Map<String, dynamic> json)
+      : title = json['title'],
+        about = json['about'],
+        genre = json['genre'],
+        age = json['age'];
+}
+
+2번 파일 lib/models/webtoon_episode_model.dart
+class WebtoonEpisodeModel {
+  final String id, title, rating, date;
+
+  WebtoonEpisodeModel.fromJson(Map<String, dynamic> json)
+      : id = json['id'],
+        title = json['title'],
+        rating = json['rating'],
+        date = json['date'];
+}
+
+3번 파일 
+lib/services/api_service.dart
+
+import 'dart:convert';
+
+import 'package:http/http.dart' as http;
+import 'package:toonflix/models/webtoon_detail_model.dart';
+import 'package:toonflix/models/webtoon_episode_model.dart';
+import 'package:toonflix/models/webtoon_model.dart';
+
+class ApiService {
+  static const String baseUrl =
+      "https://webtoon-crawler.nomadcoders.workers.dev";
+  static const String today = "today";
+  static Future<List<WebtoonModel>> getTodaysToons() async {
+    List<WebtoonModel> webtoonInstances = [];
+    final url = Uri.parse('$baseUrl/$today');
+    final response = await http.get(url);
+    if (response.statusCode == 200) {
+      final webtoons = jsonDecode(response.body);
+      for (var webtoon in webtoons) {
+        final instance = WebtoonModel.fromJson(webtoon);
+        webtoonInstances.add(instance);
+      }
+      return webtoonInstances;
+    }
+    throw Error();
+  }
+
+  static Future<WebtoonDetailModel> getToonById(String id) async {
+    final url = Uri.parse("$baseUrl/$id");
+    final response = await http.get(url);
+    if (response.statusCode == 200) {
+      final webtoon = jsonDecode(response.body);
+      return WebtoonDetailModel.fromJson(webtoon);
+    }
+    throw Error();
+  }
+
+  static Future<List<WebtoonEpisodeModel>> getLatestEpisodesById(
+      String id) async {
+    List<WebtoonEpisodeModel> episodesInstances = [];
+    final url = Uri.parse("$baseUrl/$id/episodes");
+    final response = await http.get(url);
+    if (response.statusCode == 200) {
+      final episodes = jsonDecode(response.body);
+      for (var episode in episodes) {
+        episodesInstances.add(WebtoonEpisodeModel.fromJson(episode));
+      }
+      return episodesInstances;
+    }
+    throw Error();
+  }
+}
+
+
+##6.13 Futures
+// 1. 저번 시간에 service method들을 만들어 봤는데 ID로 웹툰의 정보를 가져오는 method와 최신 에피소드를 가져오는 method였다
+// 2. 이제 DetailScreen에서 이것들을 사용할 것임 (우리가 HomeScreen에 했던 것과 비슷 -> Future를 가져오는 service를 호출했었고 그리고 FutureBuilder를 사용해서 Future가 완료되는 걸 기다렸었음 -> 그 데이터를 가지고 UI를 구현했었음) -> 그런데 DetailScreen에 이 방식 그대로 쓸 수는 없음(getLatestEpisodes에는 ID가 필요하고 getToonById도 ID가 필요하기 때문)
+// 3. 방법: HomeScreen이랑 똑같이 해 본다 -> Future를 가져오기 위해 Future라 적어주고 Future의 자료형은 WebtoonDetailModel이 될 것임 -> webtoon이라 적어주고 값은 ApiService.getToonById(id) 일 것임 -> 그렇게 할 수가 없닥 (webtoon property를 초기화할 때 다른 property인 id에 대한 접근이 불가함(우리가 할 수 있는 건 class의 member들을 define하고 초기화하는 것 뿐이므로) -> 어떤 property를 초기화할 떄 다른 property로는 접근할 수 없다 -> 약간 다르게 접근하자 -> 이 문제를 해결하기 위해서는 우선 DetailScreen을 StatefulWidget으로 바꿔야 한다 -> 마우스를 여기에 올려서 action을 열어서 Convert to StatefulWidget을 클릭해준다
+-> 결괴: 그 전에는 이렇게 title만 적혀 있었다(StatelessWidget 이었기 때문) -> 하지만 이제 title은 StatefulWidget의 안에 있고 별개의 State class -> 그래서 이렇게 title을 찾지 못하고 있다(찾지 못하는 이유: 별개의 class이기 때문) -> 사용자가 DetailScreen으로 이동할 때 사용자는 DetailScreen으로 data를 보낸다 -> webtoon widget으로 이동하면 우리가 Navigator 부분을 진행할 때 DetailScreen을 빌드하고 title, thumbnail, id를 전달함 -> 이 DetailScreen은 StatefulWidget -> 이 data들은 이 state까지 전달되지 않았는데 여전히 해당 data에 접근하고 싶다 -> 그러려면 widget(DetailScreen) 을 먼저 쓰고 뒤에 data를 적어주면 된다 -> 이게 State의 build method가 State가 속한 StatefulWidget의 data를 받아오는 방법
+-> 그래서 widget.title 이라고 적음 -> widget은 부모인 DetailScreen과 StatefulWidget에게 가라는 의미  -> StatelessWidget에서는 title, thumb, id를 그대로 쓰면 되고 StatefulWidget에서는 State의 build method에서 widget.title이라고 적어줘야 함 -> widget.thumb으로 리팩토링 -> Future가 State class에 위치하길 원한다 -> 전에 있던 부분을 붙여넣기 해줄 것인데 아직 error가 나타난다 -> constructor에서 widget이 참조될 수 없기 때문 -> 그러면 WebtoonDetailModel을 import해주고 이것을 나중에 define할 거라고 적어준다 -> 이 녀석은 initState()에서 define해줄 것임 -> 그래서 initState() 내에 webtoon은 ApiService.getToonById(widget.id)라고 적어준다 -> initState()에서는 widget.id에 접근 가능
+-> widget.어쩌고 라고 적어야 하는 이유: 별개의 class에서 작업하고 있기 때문(우리는 State를 extend 하는 class에 있는데 data는 StatefulWidget인 DetailScreen으로 전달됨)
+-> 우리가 HomeScreen에서 보낸 데이터는 바로 이것임 -> State class에서 해당 데이터를 받기 위해 widget.id를 통해 참조하고 있다 -> 데이터를 받아오려면 이렇게 하면 되는 것임.
+-> 이제 webtoon이라는 Future를 안전하게 초기화할 수 있게 되었다 -> webtoon episodes에도 똑같이 해 줌
+-> late modifier: 초기화하고 싶은 property가 있지만 contructor에서는 불가능 한 경우 대신 이 function에서 초기화한다
+-> 우리는 initState 가 항상 build 보다 먼저 호출된다는 걸 알고 있고 단 한 번만 호출되는 것도 알고 있다
+-> 이제 episodes를 초기화해줄 것임 -> widget.id라고 적어줘야 한다 -> 이제 필요한 건 전부 있다(두 Future가 있고 이 Future들은 FutureBuilder에 쓰일 준비도 되어 있다 -> HomeScreen과는 조금 달랐음 -> HomeScreen에서는 Future를 이렇게 초기화할 수 있었고 Future가 따로 argument를 요구하지 않았음 -> 지금은 이런 것들을 했어야 했다 -> getToonById랑  getLatestEpisodesById에게 사용자가 클릭한 ID가 필요했기 때문에)
+
+1번 파일 lib/screens/detail_screen.dart
+import 'package:flutter/material.dart';
+import 'package:toonflix/models/webtoon_detail_model.dart';
+import 'package:toonflix/models/webtoon_episode_model.dart';
+import 'package:toonflix/services/api_service.dart';
+
+class DetailScreen extends StatelessWidget {
+class DetailScreen extends StatefulWidget {
+  final String title, thumb, id;
+
+  const DetailScreen({
+    super.key,
+    required this.title,
+    required this.thumb,
+    required this.id,
+  });
+
+  @override
+  State<DetailScreen> createState() => _DetailScreenState();
+}
+
+class _DetailScreenState extends State<DetailScreen> {
+  late Future<WebtoonDetailModel> webtoon;
+  late Future<List<WebtoonEpisodeModel>> episodes;
+
+  @override
+  void initState() {
+    super.initState();
+    webtoon = ApiService.getToonById(widget.id);
+    episodes = ApiService.getLatestEpisodesById(widget.id);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        elevation: 2,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.green,
+        title: Text(
+          title,
+          widget.title,
+          style: const TextStyle(
+            fontSize: 24,
+          ),
+        ),
+      ),
+      body: Column(
+        children: [
+          const SizedBox(
+            height: 50,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Hero(
+                tag: id,
+                tag: widget.id,
+                child: Container(
+                  width: 250,
+                  clipBehavior: Clip.hardEdge,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15),
+                    boxShadow: [
+                      BoxShadow(
+                        blurRadius: 15,
+                        offset: const Offset(10, 10),
+                        color: Colors.black.withOpacity(0.3),
+                      )
+                    ],
+                  ),
+                  child: Image.network(thumb),
+                  child: Image.network(widget.thumb),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+
+## 6.14 Detail Info
+// 1. UI 만들기: SizedBox를 가지고 있는 Column이 있고 포스터를 가운데로 정렬하는 Row가 있다  -> 이 Row 아래에 FutureBuilder를 사용해보려고 하는데 FutureBuilder는 widget을 return하는 function -> 완성은 조금 이따가 하고 여기에 future을 담아줘야 함  -> 첫 번째 FutureBuilder에는 webtoon future를 사용 -> 만약 snapshot.hasData라면 여기에 container에 text를 담아서 return하고 싶다 -> 그럼 일단 Text()를 적어주고 snapshot.data라고 적어줌 -> 이미 있다는 건 확인했으므로 점 찍고 about이라고 적는다 -> snapshot에 data가 없다면그냥 Text("...")을 return -> 저장 -> webtoon이 초기화되지 않았다고 나오면 refresh 해주기 -> 클릭해주면 되게 빨리 변했음 -> 다시 한 번 refresh 해주고 클릭하면 잘 동작함 -> 다시 한 번 클릭해주면 끝
+// 2. 더 예쁘게 만들어보기: Row와 FutureBuilder 사이에 SizedBox를 하나 넣는다 -> 조금 더 공간이 생겼으므로 25 정도로 -> 텍스트를 보면 끝에서 끝까지 이어져 있는데 가운데로 배치하고 싶다 -> padding을 이용해서 이 Text를 padding 안으로 옮길 건데 간단하게 바꿔주는 숏컷을 이용한다 -> 이 Text를 Wrap with Padding 해주고 padding symmetric을 이용한다 -> 가로 방향으로 padding 값 50을 준다. -> 양 쪽으로 50이 적용된 것 이것의 사이즈를 늘려보자 -> 조금 더 큰 fontSize를 적용해줌 16 정도 -> refresh 해주고 클릭 -> Text를 보면 바뀌었음
+// 3. about에 관련된 Text를 띄우는 건 다 끝냈으나 더 많은 정보를 띄우고 싶다 (왜냐면 about만 있는 게 아니라 age 같은 정보가 더 있다) -> 그래서 Padding 안에서 Text를 렌더링하는 대신에 Column으로 Text를 감싼다 -> Wrap with Column을 눌러준다 -> 이제 Column이 생겼고 여기로 와서 또 다른 Text를 렌더링하려 하는데 이 Text는 age 값을 담지 못한다 -> 
+SizedBox도 추가하기(height 값 : 15) -> 이 텍스트를 가운데가 아니라 왼편으로 보내려면 Coulmn에 명시해주기만 하면 됨(Column이 자식 요소들을 정렬해주는 역할을 함)
+-> horizontal 방향은 Column 기준으로는 Cross Axis -> CrossAxisAlignment를 start에 맞춰지도록 한다 -> 이러면 start에 맞춰짐 -> 만약 우리가 원한다면 스토리, 판타지 옆에 슬래쉬하고 대상 연령인 age를 띄워줄 수도 있다 -> 그러기 위해서 text interpolation을 적용해본다 -> 중괄호로 감싸기 -> 슬래쉬를 적어주고 똑같이 하나 더 적어주고 snapshot도 다시 불러온다 
+
+ 1번 파일  
+lib/screens/detail_screen.dart
+import 'package:flutter/material.dart';
+import 'package:toonflix/models/webtoon_detail_model.dart';
+import 'package:toonflix/models/webtoon_episode_model.dart';
+import 'package:toonflix/services/api_service.dart';
+class DetailScreen extends StatefulWidget {
+  final String title, thumb, id;
+  const DetailScreen({
+    super.key,
+    required this.title,
+    required this.thumb,
+    required this.id,
+  });
+  @override
+  State<DetailScreen> createState() => _DetailScreenState();
+}
+class _DetailScreenState extends State<DetailScreen> {
+  late Future<WebtoonDetailModel> webtoon;
+  late Future<List<WebtoonEpisodeModel>> episodes;
+  @override
+  void initState() {
+    super.initState();
+    webtoon = ApiService.getToonById(widget.id);
+    episodes = ApiService.getLatestEpisodesById(widget.id);
+  }
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        elevation: 2,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.green,
+        title: Text(
+          widget.title,
+          style: const TextStyle(
+            fontSize: 24,
+          ),
+        ),
+      ),
+      body: Column(
+        children: [
+          const SizedBox(
+            height: 50,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Hero(
+                tag: widget.id,
+                child: Container(
+                  width: 250,
+                  clipBehavior: Clip.hardEdge,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15),
+                    boxShadow: [
+                      BoxShadow(
+                        blurRadius: 15,
+                        offset: const Offset(10, 10),
+                        color: Colors.black.withOpacity(0.3),
+                      )
+                    ],
+                  ),
+                  child: Image.network(widget.thumb),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(
+            height: 25,
+          ),
+          FutureBuilder(
+            future: webtoon,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 50,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        snapshot.data!.about,
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      Text(
+                        '${snapshot.data!.genre} / ${snapshot.data!.age}',
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                    ],
+                  ),
+                );
+              }
+              return const Text("...");
+            },
+          )
+        ],
+      ),
+    );
+  }
+}
+
+## 6.15 Episodes
+// 1. 이전 강의: FutureBuilder로 UI 만들었다 -> 헷갈리는 부분: StatefulWidget으로 변환한 이유는 initState 메소드가 필요해서 -> 그래야 getToonById랑 getLastestEpisodesById를 사용할 수 있기 때문 -> 왜냐하면 이 두 method는 유저가 클릭한 webtoon의 ID를 받아야 하는데 initState에 접근할 필요가 있음 -> 예를 들어 HomeScreen으로 가보면 HomeScreen에서는 그런 문제가 없었음 -> 문제가 없는 이유는 getTodaysToons가 어떤 데이터에도 의존하지 않기 때문 -> 어떤 데이터도 필요로 하지 않는다 -> 반면에 이 두 메소드는 데이터가 필요하다. -> 사용자가 webtoon을 탭할 때 전달되는 ID값을 필요로 한다 
+// 2. 웹툰의 정보를 나타내는 FutureBuilder는 이미 만들었으므로 또 다른 FutureBuilder가 필요한데 최신 에피소드들을 보여줄 것이다 -> 또 다른 SizedBox를 사용한다 -> 복사 붙여넣기로
+또 하나의 SizedBox를 만든다 -> 다시 FutureBuilder를 사용한다 -> FutureBuilder의 builder는 function이어야만 한다 -> 우리가 기다릴 Future는 episodes가 될 것임 -> snapshot에 data가 있으면 무언가를 return 해줄 거고 아니면 아무것도 return 하지 않을 것임 -> 그냥 이렇게 빈 Container를 return 해주면 됨, loading같은 건 따로 디스플레이하고 싶지 않음(이미 첫 부분에 loading indicator가 있으니까) -> 만약 snapshot에 data가 있으면 에피소드 리스트를 가지고 있다는 것이므로 어떻게 렌더링할 건지 정해야 한다 -> ListView를 렌더링할 건지 아니면 Column을 렌더링하는 게 좋을지 두 가지 선택지 -> Column을 선택한 이유는 ListView는 여러 요소를 다루는 데 최적화되어 있지만 동시에 구현하기 까다로운 부분이 있어서임 -> 여러 부분들로 이루어져있고 context랑 index도 신경써야함 -> 필요한 것 이상으로 복잡해짐(getLatestEpisodesById라는 Future가 에피소드 10개 밖에 return하지 않는 Future이기 때문) -> 10개 정도는 Flutter에게는 너무도 가벼운 작업임 -> ListView랑 ListViewBuilder는 리스트가 엄청 길고 최적화가 엄청 중요할 때 사용하면 된다 -> 이런 이유로 Column을 return 해줄 거임 ->  렌더링해야 하는 아이템이 많지 않아서 그렇지 만약 사용자가 이 List의 길이를 몰랐다면 ListView를 생성하는 게 맞을 것임 -> 하지만 List의 길이가 항상 10이라는 걸 아니까 그냥 Column을 사용한다 -> 
+children 적어주고 collection for 적용 -> episode라는 variable을 적어주고 일단은 Text를 return해줄 것임 -> 지금은 episode.title을 주고 나중에 수정해줄 거임 -> 이따가 여기에 쓸 widget을 만들어 줘야함
+// 3. 에피소드들은 항상 10개일 거란 걸 우리는 알고 있다 -> 그래서 ListView로 굳이 어렵게 만들 필요 없고 사용자가 해야하는 건 살짝 더 낫게 꾸며주는 것 -> 지금은 좀 못생겼고 이 SizedBox도 너무 크다 -> 25로 조정 ->  버튼처럼 보이도록 꾸며보기 -> 커다란 Container를 만들고 거기에 border radius를 준다 ->  화살표를 끝에 붙여준다 -> 우리가 하려는 건 이 Text 대신에Container를 렌더링하는 것 -> 나중에 여기에 build하는 걸 추출한다 -> 따로 빼서 하나의 widget으로 만드는 것 -> collection for은 List 안에서 List를 빌드할 수 있도록 해주어서 유용함 -> 
+여기서 snapshot.data의 각각의 episode(snapshot.data가 바로 이 future > 이 future는 webtoon의 List를 갖다줄 것임) -> 그래서 snapshot.data의 각각의 episode마다 collection for이 Text를 생성할 것임 -> 그래서 이 부분이 결론적으로는 많은 수의 Text가 됨
+// 4. episode 버튼 만들기: 해당 버튼을 클릭했을 때 그 회차로 이동해야 함 -> Container를 하나 만들어 주고 이 Container는 child로 Row를 하나 가짐 (한 쪽에 Text를, 다른 한 쪽에는 아이콘을 표시하기 위해서) -> 그래서 Row라고 적어주고 두 children을 갖게 될 텐데 하나는 에피소드의 title이고, 다른 하나는 아이콘이 될 것임 ->  Icon이라 적어주고 chevron -> 오른쪽 화살표니까 right 중에서 rounded 이 녀석을 골라줘
+// 5.좌우 간격을 유지하려면 또 padding을 넣어야 하고 FutureBuilder가 Padding을 가지고 있다 -> 우리가 Padding을 extract해서 모든 children에 적용될 수 있도록 해야 함 (첫 번째 FutureBuilder뿐만 아니라) -> 왜냐하면 Padding이 첫 번째 FutureBuilder에만 있는데 이 녀석한테 Padding을 복사 붙여넣기 하고 싶지 않기 때문 -> Padding으로 와서 shortcut을 열어서 Remove this widget을 누름 -> Column에 Padding을 입히려 함 ->  body가 시작될 때 Padding과 함께 시작될 것임 -> Column 위에 마우스를 올려놓고 shortcut에 들어가서 Wrap with padding을 눌러준다 -> symmetric으로 설정해주고 horizontal 값으로 50를 준다 -. 이제 전부 다 Padding을 가지고 있게 됨
+// 6. Container를 마저 수정 -> Container에 초록색 배경을 넣는다 -> opacity나 shade를 줄 수도 있다 -> Colors.green. 을 입력해주면 여러 종류의 shade가 있다 -> shade300적용 및 const지우기 -> Row를 Padding 안으로 넣어준다 -> Row로 이동해서 code action을 열고 Wrap with padding을 눌러준다 -> 그리고 Padding은 마찬가지로 symmetric일 것이다 -> vertical은 20, horizontal은 40을 준다 -> overflow 문제가 있는데 어떻게 고치면 되는지 알고 있다 -> 첫 어플리케이션 만들 때 본 적 있다 -> body로 와서 Padding을 singleChildScrollView로 감싸면 돼
+-> 저장해주면 scroll down할 수 있게 됨
+// 6. 버튼 마무리: 버튼에 border radius가 필요 (더 멋져 보이도록) -> Container에 borderRadius를 추가하고 20 -> 텍스트를 하얀색으로 만들어주자 -> Column 텍스트와 아이콘의 색을 모두 하얀색으로 바꿔줘야 함 -> shade를 조금 더 어둡게 400으로 -> 아이콘의 색 바꾸기
+// 7. 화살표를 끝에 두고 싶다 -> horizontal 방향이 Row의 main axis이기 때문에 mainAxisAlignment를 이용해야 함
+// 8. 버튼들 사이에 공간을 추가하면 좋음 -> 초록색 Container에 margin을 추가하기 -> 버튼에 margin이 생겼음 -> 10으로 설정 -> 문제가 하나 있다 -> singleChildScrollView가 잘 동작하고 있고 맨 끝으로 내리면 모든 episode를 볼 수 있는 건 좋으나 좀 더 공간이 있었으면 좋겠다, 너무 낮다 -> 이 위에 있는 Padding으로 와서 SizedBox는 지운다 -> 포스터가 네비게이션 바에 닿아있으므로  Padding을 적용해줌 -> 50 적용 -> 50만큼의 공간이 있고 아래 쪽에도 있음 -> 아래 쪽으로 내려오면 50만큼 생김 -> 이제 이 값들이 같기 때문에 EdgeInsets.all(50)라고 적어줄 수도 있다
+// 9, 코드 챌린지: 초록색 바탕에 흰색 글씨 대신에 초록색 글씨에 여기 초록색 테두리를 두르면 어떨까?
+이러면 끝이야
+// 10. 폰트를 더 크고 두껍게 만들자: episode title을 렌더링하는 곳에서 fontSize를 16으로 준다 -> 이후 저장하면 끝
+
+
+1번 파일  
+lib/screens/detail_screen.dart
+
+import 'package:flutter/material.dart';
+import 'package:toonflix/models/webtoon_detail_model.dart';
+import 'package:toonflix/models/webtoon_episode_model.dart';
+import 'package:toonflix/services/api_service.dart';
+class DetailScreen extends StatefulWidget {
+  final String title, thumb, id;
+  const DetailScreen({
+    super.key,
+    required this.title,
+    required this.thumb,
+    required this.id,
+  });
+  @override
+  State<DetailScreen> createState() => _DetailScreenState();
+}
+class _DetailScreenState extends State<DetailScreen> {
+  late Future<WebtoonDetailModel> webtoon;
+  late Future<List<WebtoonEpisodeModel>> episodes;
+  @override
+  void initState() {
+    super.initState();
+    webtoon = ApiService.getToonById(widget.id);
+    episodes = ApiService.getLatestEpisodesById(widget.id);
+  }
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        elevation: 2,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.green,
+        title: Text(
+          widget.title,
+          style: const TextStyle(
+            fontSize: 24,
+          ),
+        ),
+      ),
+      body: Column(
+        children: [
+          const SizedBox(
+            height: 50,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(50),
+          child: Column(
+            children: [
+              Hero(
+                tag: widget.id,
+                child: Container(
+                  width: 250,
+                  clipBehavior: Clip.hardEdge,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15),
+                    boxShadow: [
+                      BoxShadow(
+                        blurRadius: 15,
+                        offset: const Offset(10, 10),
+                        color: Colors.black.withOpacity(0.3),
+                      )
+                    ],
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Hero(
+                    tag: widget.id,
+                    child: Container(
+                      width: 250,
+                      clipBehavior: Clip.hardEdge,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(15),
+                        boxShadow: [
+                          BoxShadow(
+                            blurRadius: 15,
+                            offset: const Offset(10, 10),
+                            color: Colors.black.withOpacity(0.3),
+                          )
+                        ],
+                      ),
+                      child: Image.network(widget.thumb),
+                    ),
+                  ),
+                  child: Image.network(widget.thumb),
+                ),
+                ],
+              ),
+              const SizedBox(
+                height: 25,
+              ),
+              FutureBuilder(
+                future: webtoon,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          snapshot.data!.about,
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                        const SizedBox(
+                          height: 15,
+                        ),
+                        Text(
+                          '${snapshot.data!.genre} / ${snapshot.data!.age}',
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                      ],
+                    );
+                  }
+                  return const Text("...");
+                },
+              ),
+              const SizedBox(
+                height: 25,
+              ),
+              FutureBuilder(
+                future: episodes,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return Column(
+                      children: [
+                        for (var episode in snapshot.data!)
+                          Container(
+                            margin: const EdgeInsets.only(bottom: 10),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              color: Colors.green.shade400,
+                              boxShadow: [
+                                BoxShadow(
+                                  blurRadius: 5,
+                                  offset: const Offset(5, 5),
+                                  color: Colors.black.withOpacity(0.1),
+                                ),
+                              ],
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 10,
+                                horizontal: 20,
+                              ),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    episode.title,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                  const Icon(
+                                    Icons.chevron_right_rounded,
+                                    color: Colors.white,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                      ],
+                    );
+                  }
+                  return Container();
+                },
+              )
+            ],
+          ),
+          const SizedBox(
+            height: 25,
+          ),
+          FutureBuilder(
+            future: webtoon,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 50,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        snapshot.data!.about,
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      Text(
+                        '${snapshot.data!.genre} / ${snapshot.data!.age}',
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                    ],
+                  ),
+                );
+              }
+              return const Text("...");
+            },
+          )
+        ],
+        ),
+      ),
+    );
+  }
+}
+
+## 6.16 Url Launcher
+// 1. 사용자가 이 버튼을 클릭하면 브라우저로 이동할 수 있게 만들 것임 (Flutter에서 브라우저를 여는 방법) -> url_launcher라는 패키지를 설치해야 함 -> 설치 후 configuration 파일에 뭔가를 복붙해야 함(만약에 ios로 작업하고 있다면 이 녀석을 info.plist 파일로 복사 붙여넣기 해주면 됨 / 만약 안드로이드로 작업 중이라면 이 XML을 AndroidManifest.xml에 추가해주면 된다)
+-> 아주 중요한 건 보다시피 어떤 종류의 url을 열 건지 명시해줘야 됨 -> url_launcher는 http url만 실행하는 게 아니라 sms url이나 telephone url도 실행할 수 있다 -> ios에서는 어떤 종류의 scheme을 이용하고 싶은지 명시해야 된다 -> sms나 telephone 경우엔 그냥 https를 쓸 거다 -> scheme은 https, mailto, tel, sms, file이 있음 -> ios에서만 작업할 것이므로 복사하고 info.plist를 찾는다 -> 만약 안드로이드라면 android 폴더로 와서 app 내부의 src, main, AndoridManifest.xml 안에 이 AndroidManifest.xml이란 녀석에 뭔가를 여기로 복사 붙여넣기 해줘야 한다 -> android를 닫고 ios로 와서 Runner안에 있는 info.plist를 찾아야 됨 -> 맨 아래로 와서 configuration을 여기 붙여넣기  -> 하지만 우리는 sms랑 tel이 아니라 https를 register 해줄 것임 -> https라 적고 다 했다면 stop을 누른다 (방금 Flutter 밖에서 파일을 수정했으니까) (방금 AndroidManifest.xml 혹은 info.plist를 수정했는데 Flutter가 실행되는 플랫폼의 configuration 파일임 -> 그래서 이걸 닫아주고 다시 main.dart로 돌아가서 다시 한 번 이걸 눌러준다 -> 그렇게 하면 프로젝트가 rebuild된다. ->이렇게 해야 하는 이유는 우리가 방금 Xcode나 Android 파일을 변경했기 때문 -> 이건 hot reloading이 안 된다. hot reloading은 dart 코드 변경만 감지함 -> 지금은 더 중요한 파일을 변경했어
+// 2. 그럼 이제 DetailScreen으로 이동해서 method를 하나 만들고 방금 설치한 url launcher를 사용하도록 만든다 -> 이름은 onButtonTap -> 먼저 url을 하나 만든다(Google 사용) -> 
+launchUrl은 여기 있고 launchUrl은 Future을 가져다 주는 function이기 때문에 마우스를 위에 올려보면 Future를 주니까 이걸 await 해야 한다 -> 그러려면 여기에 async를 적어줘야 하고 여기에 await를 적어주면 url이 launch 될 것이다 -> 이를 대신해서 할 수 있는 건 launchUrlString을 이용해서 String을 전달하기만 하면 된다.
+// 3. 버튼에 GestureDetector를 추가(버튼이 클릭되는 걸 감지하고 처리하기 위해서) -> episodes를 담당하던 FutureBuilder에 episodes가 잔뜩 있는 Column이 있다, 그 Column이 collection for로 이것들을 build 하고 있다(버튼 전부를 만들고 있는 거) -> 이걸 각각의 widget으로 분리해야 된다 -> 그래서 마우스를 위에 올려두고 Extract Widget을 눌러준다 -> 이걸 episode 혹은 webtoon episode라 불러줄 것이다 -> 그냥 Episode로 하면 알아서 리팩토링 된다. -> 내려오면 Episode widget이 생겼다 -> 이 onButtonTap 메소드는 여기 DetailScreenState에 있을 필요가 없다 -> Episode widget으로 옮겨준다 -> 그리고 import 해주면 끝 -> widgets에 들어가서 episode_widget.dart라고 명명여기 붙여넣기 해주고 Text를 import하고launchUrlString도 import 해주면 끝 -> 당연히 Episode도 import 해줘야 하고 그러면 전부 import 되었다
+// 4. 이제 detail_screen은 닫아주고 episode_widget을 중점적으로 들여다본다 -> 사용자가 Container를 탭하는 걸 감지해야 함 -> 이걸 위해서 GestureDetector를 사용함 -> GestureDetector라는 widget으로 감싸주고 탭하면 이 코드를 실행하라고 적는다 -> refresh -> 구글로 이동을 하므로 제대로 잘 동작함
+
+// 5. 실제로 사용자를 보내야 하는 url은 comic.naver.com/webtoon/detail 이런 식이다. -> webtoon의 ID 값이 필요하고 에피소드의 ID 혹은 번호가 필요하다 (다행히 이미 전부 다 가지고 있는 것들) -> 그럼 이 부분을 전부 복사해서 이걸로 바꿔줌 -> webtoon의 ID와 episode의 ID로 바꿔줘야 함  -> Episode widget을 따로 빼줬기 때문에 Episode에 관한 data를 가지고 있는 final field가 있다(이거 하나에 대한 정보를 가지고 있는 것, 마지막 부분에 들어갈 정보는 이미 있는 것) -> 하지만 이제 webtoon의 ID값도 받아와야 함 -> 그러기 위해서는 다시 DetailScreen으로 돌아가서 여기 우리가 Episode widget을 초기화할 때 webtoon의 ID도 함께 보낼 것임 -> widget.id는 DetailScreen의 ID를 뜻하는데그게 바로 사용자가 클릭한 webtoon
+-> 이제 Episode가 이걸 받는다는 걸 알려줘야함 -> 그러기 위해서 다시 Episode로 돌아가서 webtoon_id라 적어주고 required로 만들어준다 -> camel case를 사용하면 더 좋음 -> 전부 webtoonId로 바꿔주고 이제 사용자가 버튼을 탭하면 해당 webtoon의 ID를 알 수 있으니까 여기로 와서 입력하면 끝
+// 6. 참조하는 webtoonId는 하나의 값이기 때문에 괄호는 필요없음 -> episode.id 같은 거를 할 때는 중괄호들이 필요하다 -> 이제 사용자가 버튼을 눌렀을 때 해당 webtoon ID와 해당 episode ID를 읽어올 것임 -> 눌러주고 36화로 가보면 잘 동작한다 -> 완료를 누르면 공식 웹사이트에서 에피소드를 열고 있다 -> 이게 바로 web view
+// 7. 우리가 한 것들 중 생각이 필요했던 건 webtoon ID를 받아오는 거 -> 그건 URL 때문이었음 -> webtoon ID랑 episode ID를 전달해야 했으니까 -> 이 StatelessWidget에서는 episode ID 밖에 전달받지 못했는데 episode card였기 때문 ->  하지만 webtoon ID도 필요했음 -> URL을 제대로 만들기 위해서
+
+1번 파일  ios/Flutter/Debug.xcconfig
+
+#include? "Pods/Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig"
+#include "Generated.xcconfig"
+
+2번 파일  ios/Flutter/Release.xcconfig
+#include? "Pods/Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"
+#include "Generated.xcconfig"
+
+3번 파일  
+ios/Podfile
+
+# Uncomment this line to define a global platform for your project
+# platform :ios, '11.0'
+
+# CocoaPods analytics sends network stats synchronously affecting flutter build latency.
+ENV['COCOAPODS_DISABLE_STATS'] = 'true'
+
+project 'Runner', {
+  'Debug' => :debug,
+  'Profile' => :release,
+  'Release' => :release,
+}
+
+def flutter_root
+  generated_xcode_build_settings_path = File.expand_path(File.join('..', 'Flutter', 'Generated.xcconfig'), __FILE__)
+  unless File.exist?(generated_xcode_build_settings_path)
+    raise "#{generated_xcode_build_settings_path} must exist. If you're running pod install manually, make sure flutter pub get is executed first"
+  end
+
+  File.foreach(generated_xcode_build_settings_path) do |line|
+    matches = line.match(/FLUTTER_ROOT\=(.*)/)
+    return matches[1].strip if matches
+  end
+  raise "FLUTTER_ROOT not found in #{generated_xcode_build_settings_path}. Try deleting Generated.xcconfig, then run flutter pub get"
+end
+
+require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelper'), flutter_root)
+
+flutter_ios_podfile_setup
+
+target 'Runner' do
+  use_frameworks!
+  use_modular_headers!
+
+  flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
+end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    flutter_additional_ios_build_settings(target)
+  end
+end
+
+4번 파일 ios/Podfile.lock
+PODS:
+  - Flutter (1.0.0)
+  - url_launcher_ios (0.0.1):
+    - Flutter
+
+DEPENDENCIES:
+  - Flutter (from `Flutter`)
+  - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: Flutter
+  url_launcher_ios:
+    :path: ".symlinks/plugins/url_launcher_ios/ios"
+
+SPEC CHECKSUMS:
+  Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
+  url_launcher_ios: 839c58cdb4279282219f5e248c3321761ff3c4de
+
+PODFILE CHECKSUM: ef19549a9bc3046e7bb7d2fab4d021637c0c58a3
+
+COCOAPODS: 1.11.3
+
+5번 파일 ios/Runner.xcodeproj/project.pbxproj
+
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+/* Begin PBXBuildFile section */
+		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
+		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
+		4DBCA62D014709795822DAB3 /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27CF30F97FF60D18F1360EA1 /* Pods_Runner.framework */; };
+		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
+		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
+		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
+		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
+/* End PBXBuildFile section */
+/* Begin PBXCopyFilesBuildPhase section */
+		9705A1C41CF9048500538489 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+/* Begin PBXFileReference section */
+		1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GeneratedPluginRegistrant.h; sourceTree = "<group>"; };
+		1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeneratedPluginRegistrant.m; sourceTree = "<group>"; };
+		261ED58A51B9E2B6CA1177DD /* Pods-Runner.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.debug.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig"; sourceTree = "<group>"; };
+		27CF30F97FF60D18F1360EA1 /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = AppFrameworkInfo.plist; path = Flutter/AppFrameworkInfo.plist; sourceTree = "<group>"; };
+		71108F9983B00BB797540912 /* Pods-Runner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"; sourceTree = "<group>"; };
+		74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Runner-Bridging-Header.h"; sourceTree = "<group>"; };
+		74858FAE1ED2DC5600515810 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		7AFA3C8E1D35360C0083082E /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Release.xcconfig; path = Flutter/Release.xcconfig; sourceTree = "<group>"; };
+		9740EEB21CF90195004384FC /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Debug.xcconfig; path = Flutter/Debug.xcconfig; sourceTree = "<group>"; };
+		9740EEB31CF90195004384FC /* Generated.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Generated.xcconfig; path = Flutter/Generated.xcconfig; sourceTree = "<group>"; };
+		97C146EE1CF9000F007C117D /* Runner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Runner.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		97C146FB1CF9000F007C117D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		97C146FD1CF9000F007C117D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		97C147001CF9000F007C117D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		97C147021CF9000F007C117D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AD1BEC149E15C97D748F2833 /* Pods-Runner.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile.xcconfig"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		97C146EB1CF9000F007C117D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4DBCA62D014709795822DAB3 /* Pods_Runner.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		115184DEBD90F46E3C4D6A22 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				27CF30F97FF60D18F1360EA1 /* Pods_Runner.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		2D951F078A379D06ED940BFD /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				261ED58A51B9E2B6CA1177DD /* Pods-Runner.debug.xcconfig */,
+				71108F9983B00BB797540912 /* Pods-Runner.release.xcconfig */,
+				AD1BEC149E15C97D748F2833 /* Pods-Runner.profile.xcconfig */,
+			);
+			name = Pods;
+			path = Pods;
+			sourceTree = "<group>";
+		};
+		9740EEB11CF90186004384FC /* Flutter */ = {
+			isa = PBXGroup;
+			children = (
+				3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */,
+				9740EEB21CF90195004384FC /* Debug.xcconfig */,
+				7AFA3C8E1D35360C0083082E /* Release.xcconfig */,
+				9740EEB31CF90195004384FC /* Generated.xcconfig */,
+			);
+			name = Flutter;
+			sourceTree = "<group>";
+		};
+		97C146E51CF9000F007C117D = {
+			isa = PBXGroup;
+			children = (
+				9740EEB11CF90186004384FC /* Flutter */,
+				97C146F01CF9000F007C117D /* Runner */,
+				97C146EF1CF9000F007C117D /* Products */,
+				2D951F078A379D06ED940BFD /* Pods */,
+				115184DEBD90F46E3C4D6A22 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		97C146EF1CF9000F007C117D /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				97C146EE1CF9000F007C117D /* Runner.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		97C146F01CF9000F007C117D /* Runner */ = {
+			isa = PBXGroup;
+			children = (
+				97C146FA1CF9000F007C117D /* Main.storyboard */,
+				97C146FD1CF9000F007C117D /* Assets.xcassets */,
+				97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */,
+				97C147021CF9000F007C117D /* Info.plist */,
+				1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */,
+				1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */,
+				74858FAE1ED2DC5600515810 /* AppDelegate.swift */,
+				74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */,
+			);
+			path = Runner;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+/* Begin PBXNativeTarget section */
+		97C146ED1CF9000F007C117D /* Runner */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 97C147051CF9000F007C117D /* Build configuration list for PBXNativeTarget "Runner" */;
+			buildPhases = (
+				D54C3A550544FA13F8D6A549 /* [CP] Check Pods Manifest.lock */,
+				9740EEB61CF901F6004384FC /* Run Script */,
+				97C146EA1CF9000F007C117D /* Sources */,
+				97C146EB1CF9000F007C117D /* Frameworks */,
+				97C146EC1CF9000F007C117D /* Resources */,
+				9705A1C41CF9048500538489 /* Embed Frameworks */,
+				3B06AD1E1E4923F5004D2608 /* Thin Binary */,
+				0F80B336CFEB84835F7EF261 /* [CP] Embed Pods Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Runner;
+			productName = Runner;
+			productReference = 97C146EE1CF9000F007C117D /* Runner.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+/* Begin PBXProject section */
+		97C146E61CF9000F007C117D /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 1300;
+				ORGANIZATIONNAME = "";
+				TargetAttributes = {
+					97C146ED1CF9000F007C117D = {
+						CreatedOnToolsVersion = 7.3.1;
+						LastSwiftMigration = 1100;
+					};
+				};
+			};
+			buildConfigurationList = 97C146E91CF9000F007C117D /* Build configuration list for PBXProject "Runner" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 97C146E51CF9000F007C117D;
+			productRefGroup = 97C146EF1CF9000F007C117D /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				97C146ED1CF9000F007C117D /* Runner */,
+			);
+		};
+/* End PBXProject section */
+/* Begin PBXResourcesBuildPhase section */
+		97C146EC1CF9000F007C117D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */,
+				3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */,
+				97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */,
+				97C146FC1CF9000F007C117D /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		0F80B336CFEB84835F7EF261 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		3B06AD1E1E4923F5004D2608 /* Thin Binary */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Thin Binary";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "/bin/sh \"$FLUTTER_ROOT/packages/flutter_tools/bin/xcode_backend.sh\" embed_and_thin";
+		};
+		9740EEB61CF901F6004384FC /* Run Script */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Run Script";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "/bin/sh \"$FLUTTER_ROOT/packages/flutter_tools/bin/xcode_backend.sh\" build";
+		};
+		D54C3A550544FA13F8D6A549 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-Runner-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		97C146EA1CF9000F007C117D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */,
+				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+/* Begin PBXVariantGroup section */
+		97C146FA1CF9000F007C117D /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				97C146FB1CF9000F007C117D /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				97C147001CF9000F007C117D /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+/* Begin XCBuildConfiguration section */
+		249021D3217E4FDB00AE95B9 /* Profile */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Profile;
+		};
+		249021D4217E4FDB00AE95B9 /* Profile */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7AFA3C8E1D35360C0083082E /* Release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+				ENABLE_BITCODE = NO;
+				INFOPLIST_FILE = Runner/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.toonflix;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
+				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = Profile;
+		};
+		97C147031CF9000F007C117D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		97C147041CF9000F007C117D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		97C147061CF9000F007C117D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9740EEB21CF90195004384FC /* Debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+				ENABLE_BITCODE = NO;
+				INFOPLIST_FILE = Runner/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.toonflix;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = Debug;
+		};
+		97C147071CF9000F007C117D /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7AFA3C8E1D35360C0083082E /* Release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+				ENABLE_BITCODE = NO;
+				INFOPLIST_FILE = Runner/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.toonflix;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
+				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+/* Begin XCConfigurationList section */
+		97C146E91CF9000F007C117D /* Build configuration list for PBXProject "Runner" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				97C147031CF9000F007C117D /* Debug */,
+				97C147041CF9000F007C117D /* Release */,
+				249021D3217E4FDB00AE95B9 /* Profile */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		97C147051CF9000F007C117D /* Build configuration list for PBXNativeTarget "Runner" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				97C147061CF9000F007C117D /* Debug */,
+				97C147071CF9000F007C117D /* Release */,
+				249021D4217E4FDB00AE95B9 /* Profile */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 97C146E61CF9000F007C117D /* Project object */;
+}
+
+6번 파일  
+ios/Runner.xcworkspace/contents.xcworkspacedata
+<?xml version="1.0" encoding="UTF-8"?>
+<Workspace
+   version = "1.0">
+   <FileRef
+      location = "group:Runner.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:Pods/Pods.xcodeproj">
+   </FileRef>
+</Workspace>
+
+7번 파일ios/Runner/Info.plist
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>CFBundleDisplayName</key>
+	<string>Toonflix</string>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>toonflix</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(FLUTTER_BUILD_NAME)</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleVersion</key>
+	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>UILaunchStoryboardName</key>
+	<string>LaunchScreen</string>
+	<key>UIMainStoryboardFile</key>
+	<string>Main</string>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<false/>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
+	<key>UIApplicationSupportsIndirectInputEvents</key>
+	<true/>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>https</string>
+	</array>
+</dict>
+</plist>
+
+8번 파일   
+lib/screens/detail_screen.dart
+import 'package:flutter/material.dart';
+import 'package:toonflix/models/webtoon_detail_model.dart';
+import 'package:toonflix/models/webtoon_episode_model.dart';
+import 'package:toonflix/services/api_service.dart';
+import 'package:toonflix/widgets/episode_widget.dart';
+
+class DetailScreen extends StatefulWidget {
+  final String title, thumb, id;
+  const DetailScreen({
+    super.key,
+    required this.title,
+    required this.thumb,
+    required this.id,
+  });
+  @override
+  State<DetailScreen> createState() => _DetailScreenState();
+}
+class _DetailScreenState extends State<DetailScreen> {
+  late Future<WebtoonDetailModel> webtoon;
+  late Future<List<WebtoonEpisodeModel>> episodes;
+  @override
+  void initState() {
+    super.initState();
+    webtoon = ApiService.getToonById(widget.id);
+    episodes = ApiService.getLatestEpisodesById(widget.id);
+  }
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        elevation: 2,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.green,
+        title: Text(
+          widget.title,
+          style: const TextStyle(
+            fontSize: 24,
+          ),
+        ),
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(50),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Hero(
+                    tag: widget.id,
+                    child: Container(
+                      width: 250,
+                      clipBehavior: Clip.hardEdge,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(15),
+                        boxShadow: [
+                          BoxShadow(
+                            blurRadius: 15,
+                            offset: const Offset(10, 10),
+                            color: Colors.black.withOpacity(0.3),
+                          )
+                        ],
+                      ),
+                      child: Image.network(widget.thumb),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(
+                height: 25,
+              ),
+              FutureBuilder(
+                future: webtoon,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          snapshot.data!.about,
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                        const SizedBox(
+                          height: 15,
+                        ),
+                        Text(
+                          '${snapshot.data!.genre} / ${snapshot.data!.age}',
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                      ],
+                    );
+                  }
+                  return const Text("...");
+                },
+              ),
+              const SizedBox(
+                height: 25,
+              ),
+              FutureBuilder(
+                future: episodes,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return Column(
+                      children: [
+                        for (var episode in snapshot.data!)
+                          Container(
+                            margin: const EdgeInsets.only(bottom: 10),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              color: Colors.green.shade400,
+                              boxShadow: [
+                                BoxShadow(
+                                  blurRadius: 5,
+                                  offset: const Offset(5, 5),
+                                  color: Colors.black.withOpacity(0.1),
+                                ),
+                              ],
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 10,
+                                horizontal: 20,
+                              ),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    episode.title,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                  const Icon(
+                                    Icons.chevron_right_rounded,
+                                    color: Colors.white,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          Episode(
+                            episode: episode,
+                            webtoonId: widget.id,
+                          )
+                      ],
+                    );
+                  }
+                  return Container();
+                },
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+9번 파일 lib/widgets/episode_widget.dart
+import 'package:flutter/material.dart';
+import 'package:toonflix/models/webtoon_episode_model.dart';
+import 'package:url_launcher/url_launcher_string.dart';
+
+class Episode extends StatelessWidget {
+  const Episode({
+    Key? key,
+    required this.episode,
+    required this.webtoonId,
+  }) : super(key: key);
+
+  final String webtoonId;
+  final WebtoonEpisodeModel episode;
+
+  onButtonTap() async {
+    await launchUrlString(
+        "https://comic.naver.com/webtoon/detail?titleId=$webtoonId&no=${episode.id}");
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onButtonTap,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          color: Colors.green.shade400,
+          boxShadow: [
+            BoxShadow(
+              blurRadius: 2,
+              offset: const Offset(2, 2),
+              color: Colors.black.withOpacity(0.1),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            vertical: 10,
+            horizontal: 20,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                episode.title,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                ),
+              ),
+              const Icon(
+                Icons.chevron_right_rounded,
+                color: Colors.white,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+10번 파일  linux/flutter/generated_plugin_registrant.cc
+
+//
+//  Generated file. Do not edit.
+//
+// clang-format off
+
+#include "generated_plugin_registrant.h"
+
+#include <url_launcher_linux/url_launcher_plugin.h>
+
+void fl_register_plugins(FlPluginRegistry* registry) {
+  g_autoptr(FlPluginRegistrar) url_launcher_linux_registrar =
+      fl_plugin_registry_get_registrar_for_plugin(registry, "UrlLauncherPlugin");
+  url_launcher_plugin_register_with_registrar(url_launcher_linux_registrar);
+}
+
+11번 파일  
+linux/flutter/generated_plugins.cmake
+#
+# Generated file, do not edit.
+#
+
+list(APPEND FLUTTER_PLUGIN_LIST
+  url_launcher_linux
+)
+
+list(APPEND FLUTTER_FFI_PLUGIN_LIST
+)
+set(PLUGIN_BUNDLED_LIBRARIES)
+foreach(plugin ${FLUTTER_PLUGIN_LIST})
+  add_subdirectory(flutter/ephemeral/.plugin_symlinks/${plugin}/linux plugins/${plugin})
+  target_link_libraries(${BINARY_NAME} PRIVATE ${plugin}_plugin)
+  list(APPEND PLUGIN_BUNDLED_LIBRARIES $<TARGET_FILE:${plugin}_plugin>)
+  list(APPEND PLUGIN_BUNDLED_LIBRARIES ${${plugin}_bundled_libraries})
+endforeach(plugin)
+foreach(ffi_plugin ${FLUTTER_FFI_PLUGIN_LIST})
+  add_subdirectory(flutter/ephemeral/.plugin_symlinks/${ffi_plugin}/linux plugins/${ffi_plugin})
+  list(APPEND PLUGIN_BUNDLED_LIBRARIES ${${ffi_plugin}_bundled_libraries})
+endforeach(ffi_plugin)
+
+12번 파일  
+macos/Flutter/Flutter-Debug.xcconfig
+
+#include? "Pods/Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig"
+#include "ephemeral/Flutter-Generated.xcconfig"
+
+13번 파일 
+macos/Flutter/Flutter-Release.xcconfig
+
+#include? "Pods/Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"
+#include "ephemeral/Flutter-Generated.xcconfig"
+
+14번 파일 
+macos/Flutter/GeneratedPluginRegistrant.swift
+
+//
+//  Generated file. Do not edit.
+//
+import FlutterMacOS
+import Foundation
+
+import url_launcher_macos
+
+func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
+  UrlLauncherPlugin.register(with: registry.registrar(forPlugin: "UrlLauncherPlugin"))
+}
+
+15번 파일
+ 
+macos/Podfile
+
+platform :osx, '10.11'
+
+# CocoaPods analytics sends network stats synchronously affecting flutter build latency.
+ENV['COCOAPODS_DISABLE_STATS'] = 'true'
+
+project 'Runner', {
+  'Debug' => :debug,
+  'Profile' => :release,
+  'Release' => :release,
+}
+
+def flutter_root
+  generated_xcode_build_settings_path = File.expand_path(File.join('..', 'Flutter', 'ephemeral', 'Flutter-Generated.xcconfig'), __FILE__)
+  unless File.exist?(generated_xcode_build_settings_path)
+    raise "#{generated_xcode_build_settings_path} must exist. If you're running pod install manually, make sure \"flutter pub get\" is executed first"
+  end
+
+  File.foreach(generated_xcode_build_settings_path) do |line|
+    matches = line.match(/FLUTTER_ROOT\=(.*)/)
+    return matches[1].strip if matches
+  end
+  raise "FLUTTER_ROOT not found in #{generated_xcode_build_settings_path}. Try deleting Flutter-Generated.xcconfig, then run \"flutter pub get\""
+end
+
+require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelper'), flutter_root)
+
+flutter_macos_podfile_setup
+
+target 'Runner' do
+  use_frameworks!
+  use_modular_headers!
+
+  flutter_install_all_macos_pods File.dirname(File.realpath(__FILE__))
+end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    flutter_additional_macos_build_settings(target)
+  end
+end
+
+16번 파일  
+pubspec.lock
+
+# Generated by pub
+# See https://dart.dev/tools/pub/glossary#lockfile
+packages:
+  async:
+    dependency: transitive
+    description:
+      name: async
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.9.0"
+  boolean_selector:
+    dependency: transitive
+    description:
+      name: boolean_selector
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.1.0"
+  characters:
+    dependency: transitive
+    description:
+      name: characters
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.2.1"
+  clock:
+    dependency: transitive
+    description:
+      name: clock
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.1.1"
+  collection:
+    dependency: transitive
+    description:
+      name: collection
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.16.0"
+  cupertino_icons:
+    dependency: "direct main"
+    description:
+      name: cupertino_icons
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.5"
+  fake_async:
+    dependency: transitive
+    description:
+      name: fake_async
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.3.1"
+  flutter:
+    dependency: "direct main"
+    description: flutter
+    source: sdk
+    version: "0.0.0"
+  flutter_lints:
+    dependency: "direct dev"
+    description:
+      name: flutter_lints
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.1"
+  flutter_test:
+    dependency: "direct dev"
+    description: flutter
+    source: sdk
+    version: "0.0.0"
+  flutter_web_plugins:
+    dependency: transitive
+    description: flutter
+    source: sdk
+    version: "0.0.0"
+  http:
+    dependency: "direct main"
+    description:
+      name: http
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.13.5"
+  http_parser:
+    dependency: transitive
+    description:
+      name: http_parser
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "4.0.2"
+  js:
+    dependency: transitive
+    description:
+      name: js
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.6.4"
+  lints:
+    dependency: transitive
+    description:
+      name: lints
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.1"
+  matcher:
+    dependency: transitive
+    description:
+      name: matcher
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.12.12"
+  material_color_utilities:
+    dependency: transitive
+    description:
+      name: material_color_utilities
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.5"
+  meta:
+    dependency: transitive
+    description:
+      name: meta
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.8.0"
+  path:
+    dependency: transitive
+    description:
+      name: path
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.8.2"
+  plugin_platform_interface:
+    dependency: transitive
+    description:
+      name: plugin_platform_interface
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.1.3"
+  sky_engine:
+    dependency: transitive
+    description: flutter
+    source: sdk
+    version: "0.0.99"
+  source_span:
+    dependency: transitive
+    description:
+      name: source_span
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.9.0"
+  stack_trace:
+    dependency: transitive
+    description:
+      name: stack_trace
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.10.0"
+  stream_channel:
+    dependency: transitive
+    description:
+      name: stream_channel
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.1.0"
+  string_scanner:
+    dependency: transitive
+    description:
+      name: string_scanner
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.1.1"
+  term_glyph:
+    dependency: transitive
+    description:
+      name: term_glyph
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.2.1"
+  test_api:
+    dependency: transitive
+    description:
+      name: test_api
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.4.12"
+  typed_data:
+    dependency: transitive
+    description:
+      name: typed_data
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.3.1"
+  url_launcher:
+    dependency: "direct main"
+    description:
+      name: url_launcher
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "6.1.7"
+  url_launcher_android:
+    dependency: transitive
+    description:
+      name: url_launcher_android
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "6.0.22"
+  url_launcher_ios:
+    dependency: transitive
+    description:
+      name: url_launcher_ios
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "6.0.17"
+  url_launcher_linux:
+    dependency: transitive
+    description:
+      name: url_launcher_linux
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.0.1"
+  url_launcher_macos:
+    dependency: transitive
+    description:
+      name: url_launcher_macos
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.0.1"
+  url_launcher_platform_interface:
+    dependency: transitive
+    description:
+      name: url_launcher_platform_interface
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.1.1"
+  url_launcher_web:
+    dependency: transitive
+    description:
+      name: url_launcher_web
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.13"
+  url_launcher_windows:
+    dependency: transitive
+    description:
+      name: url_launcher_windows
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.0.1"
+  vector_math:
+    dependency: transitive
+    description:
+      name: vector_math
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.1.2"
+sdks:
+  dart: ">=2.18.4 <3.0.0"
+  flutter: ">=2.10.0"
+
+17번 파일 
+pubspec.yaml
+
+name: toonflix
+description: A new Flutter project.
+# The following line prevents the package from being accidentally published to
+# pub.dev using `flutter pub publish`. This is preferred for private packages.
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
+# The following defines the version and build number for your application.
+# A version number is three numbers separated by dots, like 1.2.43
+# followed by an optional build number separated by a +.
+# Both the version and the builder number may be overridden in flutter
+# build by specifying --build-name and --build-number, respectively.
+# In Android, build-name is used as versionName while build-number used as versionCode.
+# Read more about Android versioning at https://developer.android.com/studio/publish/versioning
+# In iOS, build-name is used as CFBundleShortVersionString while build-number is used as CFBundleVersion.
+# Read more about iOS versioning at
+# https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
+# In Windows, build-name is used as the major, minor, and patch parts
+# of the product and file versions while build-number is used as the build suffix.
+version: 1.0.0+1
+environment:
+  sdk: ">=2.18.4 <3.0.0"
+# Dependencies specify other packages that your package needs in order to work.
+# To automatically upgrade your package dependencies to the latest versions
+# consider running `flutter pub upgrade --major-versions`. Alternatively,
+# dependencies can be manually updated by changing the version numbers below to
+# the latest version available on pub.dev. To see which dependencies have newer
+# versions available, run `flutter pub outdated`.
+dependencies:
+  flutter:
+    sdk: flutter
+  http: ^0.13.5
+  # The following adds the Cupertino Icons font to your application.
+  # Use with the CupertinoIcons class for iOS style icons.
+  cupertino_icons: ^1.0.2
+  url_launcher: ^6.1.7
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  # The "flutter_lints" package below contains a set of recommended lints to
+  # encourage good coding practices. The lint set provided by the package is
+  # activated in the `analysis_options.yaml` file located at the root of your
+  # package. See that file for information about deactivating specific lint
+  # rules and activating additional ones.
+  flutter_lints: ^2.0.0
+# For information on the generic Dart part of this file, see the
+# following page: https://dart.dev/tools/pub/pubspec
+# The following section is specific to Flutter packages.
+flutter:
+  # The following line ensures that the Material Icons font is
+  # included with your application, so that you can use the icons in
+  # the material Icons class.
+  uses-material-design: true
+  # To add assets to your application, add an assets section, like this:
+  # assets:
+  #   - images/a_dot_burr.jpeg
+  #   - images/a_dot_ham.jpeg
+  # An image asset can refer to one or more resolution-specific "variants", see
+  # https://flutter.dev/assets-and-images/#resolution-aware
+  # For details regarding adding assets from package dependencies, see
+  # https://flutter.dev/assets-and-images/#from-packages
+  # To add custom fonts to your application, add a fonts section here,
+  # in this "flutter" section. Each entry in this list should have a
+  # "family" key with the font family name, and a "fonts" key with a
+  # list giving the asset and other descriptors for the font. For
+  # example:
+  # fonts:
+  #   - family: Schyler
+  #     fonts:
+  #       - asset: fonts/Schyler-Regular.ttf
+  #       - asset: fonts/Schyler-Italic.ttf
+  #         style: italic
+  #   - family: Trajan Pro
+  #     fonts:
+  #       - asset: fonts/TrajanPro.ttf
+  #       - asset: fonts/TrajanPro_Bold.ttf
+  #         weight: 700
+  #
+  # For details regarding fonts from package dependencies,
+  # see https://flutter.dev/custom-fonts/#from-packages
+
+18번 파일
+
+windows/flutter/generated_plugin_registrant.cc
+
+//
+//  Generated file. Do not edit.
+//
+// clang-format off
+
+#include "generated_plugin_registrant.h"
+
+#include <url_launcher_windows/url_launcher_windows.h>
+
+void RegisterPlugins(flutter::PluginRegistry* registry) {
+  UrlLauncherWindowsRegisterWithRegistrar(
+      registry->GetRegistrarForPlugin("UrlLauncherWindows"));
+}
+
+19번 파일
+ 
+windows/flutter/generated_plugins.cmake
+
+#
+# Generated file, do not edit.
+#
+
+list(APPEND FLUTTER_PLUGIN_LIST
+  url_launcher_windows
+)
+
+list(APPEND FLUTTER_FFI_PLUGIN_LIST
+)
+set(PLUGIN_BUNDLED_LIBRARIES)
+foreach(plugin ${FLUTTER_PLUGIN_LIST})
+  add_subdirectory(flutter/ephemeral/.plugin_symlinks/${plugin}/windows plugins/${plugin})
+  target_link_libraries(${BINARY_NAME} PRIVATE ${plugin}_plugin)
+  list(APPEND PLUGIN_BUNDLED_LIBRARIES $<TARGET_FILE:${plugin}_plugin>)
+  list(APPEND PLUGIN_BUNDLED_LIBRARIES ${${plugin}_bundled_libraries})
+endforeach(plugin)
+foreach(ffi_plugin ${FLUTTER_FFI_PLUGIN_LIST})
+  add_subdirectory(flutter/ephemeral/.plugin_symlinks/${ffi_plugin}/windows plugins/${ffi_plugin})
+  list(APPEND PLUGIN_BUNDLED_LIBRARIES ${${ffi_plugin}_bundled_libraries})
+endforeach(ffi_plugin)
+
+## 6.17 Favorites 
+// 1. 타이틀 옆에 하트 아이콘을 더하고 싶다 -> 만약 사용자가 아이콘을 클릭하면 그거를 기억해서 핸드폰 저장소에 작은 정보를 담을 것임(어플리케이션을 다시 실행해도 사용자가 같은 webtoon에 접속하면 이전에 하트를 눌렀던 상태가 유지되도록) -> application bar로 가서 app bar에는 widget List인 actions가 있다 -> 이 경우에는 여기 actions라고 적어주고 IconButton을 이용한다 -> 지금은 onPressed에 아무것도 부여하지 않을 거고 우리가 사용하려는 Icon은 favorite_rounded -> 이 아이콘은 webtoon에 좋아요를 눌렀을 때의 모습임 -> 좋아요를 누르기 전에는 favorite_outline_outlined를 사용하면 됨 -> 사용자가 이 하트를 클릭하면 favorite_outlined를 보여줌 -> 다시 클릭하면  좋아요를 취소함
+// 2. 어떻게 하면 핸드폰 저장소에 데이터를 담을 수 있을까? -shared_preferences라는 패키지를 이용(이걸 사용하면 핸드폰 저장소에 데이터를 담을 수 있음 -> Installing을 눌러주고 콘솔에서 실행하면 shared_preferences가 설치 -> 붙여넣기 해주기 -> 설치 끝났음
+// 3. shared_preferences의 작동 방식:  핸드폰 저장소와 connection을 만들어야 하는데 그걸 여기서 하는 것 -> 딱 한 줄로 getInstance를 해주고 나면 각기 다른 값과 각기 다른 자료형을 저장할 수 있다 -> 예를 들어 여기선 integer를 설정할 수 있다 (key는 counter고 값은 10) ->또 bool을 설정할 수도 있다 (key는 repeat, value는 true) -> 모든 자료형을 다루고 있다 integer, bool, double, String, String으로 이루어진 List까지
+// 4. 데이터를 가져오는 방법: getInt, getBool... 이라고 입력해주기만 하면 됨 -> 사용자가 버튼을 누를 때마다 좋아요를 누른 모든 ID의 리스트를 가져오려 한다 -> 이 녀석의 ID가 1이라고 하면 사용자가 좋아요를 누른 ID 모음에 1을 담아줄 것임 -> 핸드폰에 우리가 저장할 녀석들은 likedToons -> 사용자가 좋아요를 누른 ID들을 담아줄 것임 -> 화면이 로딩되면 해당 widget의 ID가
+사용자가 좋아요를 누른 ID 목록에 있는지 체크할 것임 -> 만약 있다면 버튼에 반영할 거고 없더라도 버튼을 통해 보여줄 것임 -> 사용자가 여길 클릭하면 likedToons에서 ID를 더하거나 빼줄 것임 
+// 5. 새로운 class member를 만들어줘야 하는데 그게 shared preferences instance, 초기화도 해줘야 함  -> 이제 initState 안에서 initPrefs라는 method를 호출해줄 것임 -> 
+해당 method는 비동기이기 때문에 Future가 될 것임 -> initPrefs에 async라고 적어주고 여기 prefs라고 적어줌 -> instance가 만들어졌고 사용자의 저장소에 connection이 생겼다
+-> 사용자의 저장소 내부를 검색해서 String List가 있는지 확인한다(likedToons라는 key로) -> prefs라고 적어주고 String List를 가져올 거야(likedToons로 검색) -> return type이 String List일 수도 아닐 수도 있다(왜냐면 사용자가 최초로 어플리케이션을 실행했을 때 당연히 likedToons는 저장소에 없을 거기 때문) -> 그래서 여기로 와서 그걸 체크해줄 것임 -> likedToons가 null이 아니면 나중에 뭔가를 해줄 거고 null이면 likeToons라는 String List를 만들어 줄 것임 -> 이름은 이게 될 거고 초기 값은 빈 List를 줄 거임 ->  이건 Future이기 때문에 await을 적어줘야 함 ->  지금 사용자가 처음으로 앱을 실행하는 케이스를 하고 있다 -> 사용자가 처음으로 앱을 실행하면 likedToons는 존재하지 않는다 -> 그래서 하나 만들어줌 ->
+그게 바로 이 부분 -> 만약 likedToons가 null이 아니라면 즉 이미 List가 있다는 뜻 -> 우리가 해야할 건 사용자가 지금 보고 있는 webtoon의 ID가 likedToons 안에 있는지 없는지를 확인하는 거  -> 만약 List인 likedToons에 widget.id(지금 사용자가 보고 있는 webtoon이 들어 있다면 사용자가 이 웹툰에 좋아요를 누른 적이 있다는 거) -> 이 경우에는 약간 State를 사용할 필요가 있을 거 같다 -> isLiked라고 이름 붙여주고 default 값으로는 false를 준다 -> 그리고 여기 isLiked를 true로 만들어주면 끝  -> 먼저 핸드폰 저장소에 액세스를 얻고 likedToons라는 이름의 String List가 있는지 살펴보고 만약 있다면 웹툰의 ID를 갖고 있는지 확인하는 것이다 -> 여기서 widget.id를 사용하는 이유는 지금 여긴 State이고 StatefulWidget인 DetailScreen의 ID를 가져오기 위해서임 (State안에 있는 거 말고) -> String List가 ID를 가지고 있는지 확인한 뒤에 가지고 있다면 isLiked에 true 값을 준다 그렇지 않다면 그대로 false로 남아있을 것임 -> 
+여기까지가 첫 번째 단계 -> 이제 새로고침하고 여길 클릭해주면 문제가 생김 -> 이 문제는 우리 잘못은 아니고 SharedPreferences라는 새 패키지를 설치했는데 어플리케이션을 재실행해주지 않아서  -> Stop을 누르고 다시 Play를 눌러주자(main으로 이동해서 여기 play를 다시 눌러준다) -> 그러면 어플리케이션이 다시 빌드될 것임(방금 설치한 SharedPreferences 패키지를 포함해서)
+// 6. 지금 하트를 초기화해주고 있는 중 ->  isLiked가 true 혹은 false 값을 갖는다는 걸 알고 있다 -> 사용자의 저장소에서 likedToons를 찾아 보고 likedToons가 저장소에 존재한다면 likedToons에 웹툰의 id가 들어있는지 확인해보고 들어있으면 isLiked에 true 값을 부여한다 -> 없으면 false 값을 줄 거임 
+// 7. UI에 이걸 반영하자 -> 마지막에 outlined를 없애주고 이제 확인해주면 된다 -> 만약 isLiked가 true이면 Icons.favorite를 보여줄 거고 그렇지 않다면 favorite_outline을 보여줄 것임 -> favorite이고 isLiked가 true면 이걸 보게 될 거고 아니면 이걸 보게 돈다. 
+// 8. 테두리만 있는 부분을 손 봐줘야 함 -> onPresse에 좋아요를 누르거나 취소할 수 있어야함 -> onHeartTap이라는 또 다른 method를 만들어 주자 -> 당연히 async여야 하고 likedToons가 필요함 -> likedToons가 null이 아님을 확인해야 함 -> null이 아닐 확률이 높은데 왜냐면 사용자가 하트를 누른 시점은 initState가 이미 실행된 뒤일 거임 ->  그러면 initPrefs도 호출되고 likedToons도 생성될 테니까 하지만 어찌됐든 체크해줄 것임 -> 이제 웹툰이 likedToons에 없다면 추가해줘야 하고 이미 있다면 삭제해줘야 함 -> 다행히도 isLiked에 이미 정보가 들어있어서isLiked가 true면 likedToons List에서 웹툰을 제거해줄 것임  -> 웹툰의 ID인 widget.id를 입력함 -> isLiked가 false면 widget.id를 추가해줄 것임 ->  단순히 List를 수정하고 있는 것이고 이제 해야할 건 다시 이 List를 핸드폰에 저장하는 거 -> 수정한 likedToons List를 적어줌 -> 사용자가 버튼을 클릭하면 먼저 List를 가져올 것임 -> 만약 사용자가 이미 webtoon에 좋아요를 눌렀다면 해당 webtoon을 List에서 제거해줄 것임(왜냐하면 좋아요를 취소하고 싶단 뜻이니까) -> 만약 그 전에 좋아요를 누른 적이 없다면 해당 webtoon ID를 List에 추가해줄 것임 -> 그리고 제거를 했건 추가를 했건 핸드폰 저장소에 다시금 List를 저장해줄 거임 -> setState를 해주고 isLiked에 isLiked의 반대 값을 부여하면 끝
+// 9. 이제 onHeartTap을 IconButto5n onPressed에 담아줄 거임 ->  담아주고 새로고침 -> 클릭해주면 잘 동작한다 -> 어플리케이션을 다시 실행해주면 좋아요를 눌렀던 게 유지가 안 되고 있다 -> 그 이유는 initPrefs를 할 때 List를 받아서 해당 List가 webtoon의 ID를 가지고 있는지 체크하고 만약 그렇다면 isLiked에 true 값을 주는데 setState를 하는 걸 빼먹었음
+-> 이제 잘 동작함 -> refresh 해주고 하트가 처음부터 채워져있다 -> 여기로 와서 다른 걸로 넘어가보면 하트가 안 채워져 있는 걸 볼 수 있다
+// 10. 이제 반대로 해본다 -> 여기로 와서 좋아요를 취소하면 적용됨 -> 닫고 다시 열어주면 보다시피 여전히 안 좋아하는 상태임 -> 앱을 다시 실행하고 클릭해도 여전히 안 좋아하는 상태
+-> 여기로 와서 좋아요를 클릭해주고 앱을 다시 실행해주고 클릭하면 좋아요가 눌려있다 -> 
+// 10. 정리: 내가 좋아요를 눌렀던 모든 ID의 List를 만들었다 -> 이건 한 가지 방법일 뿐이고 확인을 하는 것뿐(보고 있는 웹툰의 ID가 좋아요 리스트에 있는지 없는지)
+-> 또 다른 방법은 setBool을 이용 -> key는 웹툰의 id, value는 true를 사용하는 거 -> 웹툰의 좋아요 버튼을 누르다 보면 저장소에 이런 boolean 값이 많이 생김 ->  어떤 웹툰의 id가 key이고 value는 true인 데이터가 있으면 좋아요를 눌렀다는 뜻 -> 이것 말고도 방법은 많다, 해결 방법은 생각하기 나름이다 -> 이 방식을 고른 건 저장소에 많은 데이터를 남기기 보단 List를 하나 만들고 모든 ID를 거기에 담고 싶었기 때문
+
+1번 파일
+ 
+ios/Flutter/Debug.xcconfig
+
+#include? "Pods/Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig"
+#include "Generated.xcconfig"
+
+2번 파일 ios/Flutter/Release.xcconfig
+
+#include? "Pods/Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"
+#include "Generated.xcconfig"
+
+3번 파일  ios/Podfile
+
+# Uncomment this line to define a global platform for your project
+# platform :ios, '11.0'
+
+# CocoaPods analytics sends network stats synchronously affecting flutter build latency.
+ENV['COCOAPODS_DISABLE_STATS'] = 'true'
+
+project 'Runner', {
+  'Debug' => :debug,
+  'Profile' => :release,
+  'Release' => :release,
+}
+
+def flutter_root
+  generated_xcode_build_settings_path = File.expand_path(File.join('..', 'Flutter', 'Generated.xcconfig'), __FILE__)
+  unless File.exist?(generated_xcode_build_settings_path)
+    raise "#{generated_xcode_build_settings_path} must exist. If you're running pod install manually, make sure flutter pub get is executed first"
+  end
+
+  File.foreach(generated_xcode_build_settings_path) do |line|
+    matches = line.match(/FLUTTER_ROOT\=(.*)/)
+    return matches[1].strip if matches
+  end
+  raise "FLUTTER_ROOT not found in #{generated_xcode_build_settings_path}. Try deleting Generated.xcconfig, then run flutter pub get"
+end
+
+require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelper'), flutter_root)
+
+flutter_ios_podfile_setup
+
+target 'Runner' do
+  use_frameworks!
+  use_modular_headers!
+
+  flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
+end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    flutter_additional_ios_build_settings(target)
+  end
+end
+
+4번 파일 ios/Podfile.lock
+
+PODS:
+  - Flutter (1.0.0)
+  - url_launcher_ios (0.0.1):
+    - Flutter
+
+DEPENDENCIES:
+  - Flutter (from `Flutter`)
+  - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: Flutter
+  url_launcher_ios:
+    :path: ".symlinks/plugins/url_launcher_ios/ios"
+
+SPEC CHECKSUMS:
+  Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
+  url_launcher_ios: 839c58cdb4279282219f5e248c3321761ff3c4de
+
+PODFILE CHECKSUM: ef19549a9bc3046e7bb7d2fab4d021637c0c58a3
+
+COCOAPODS: 1.11.3
+
+5번 파일
+ 
+ios/Runner.xcodeproj/project.pbxproj
+
+
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+/* Begin PBXBuildFile section */
+		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
+		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
+		4DBCA62D014709795822DAB3 /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27CF30F97FF60D18F1360EA1 /* Pods_Runner.framework */; };
+		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
+		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
+		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
+		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
+/* End PBXBuildFile section */
+/* Begin PBXCopyFilesBuildPhase section */
+		9705A1C41CF9048500538489 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+/* Begin PBXFileReference section */
+		1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GeneratedPluginRegistrant.h; sourceTree = "<group>"; };
+		1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeneratedPluginRegistrant.m; sourceTree = "<group>"; };
+		261ED58A51B9E2B6CA1177DD /* Pods-Runner.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.debug.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig"; sourceTree = "<group>"; };
+		27CF30F97FF60D18F1360EA1 /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = AppFrameworkInfo.plist; path = Flutter/AppFrameworkInfo.plist; sourceTree = "<group>"; };
+		71108F9983B00BB797540912 /* Pods-Runner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"; sourceTree = "<group>"; };
+		74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Runner-Bridging-Header.h"; sourceTree = "<group>"; };
+		74858FAE1ED2DC5600515810 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		7AFA3C8E1D35360C0083082E /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Release.xcconfig; path = Flutter/Release.xcconfig; sourceTree = "<group>"; };
+		9740EEB21CF90195004384FC /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Debug.xcconfig; path = Flutter/Debug.xcconfig; sourceTree = "<group>"; };
+		9740EEB31CF90195004384FC /* Generated.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Generated.xcconfig; path = Flutter/Generated.xcconfig; sourceTree = "<group>"; };
+		97C146EE1CF9000F007C117D /* Runner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Runner.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		97C146FB1CF9000F007C117D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		97C146FD1CF9000F007C117D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		97C147001CF9000F007C117D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		97C147021CF9000F007C117D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AD1BEC149E15C97D748F2833 /* Pods-Runner.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile.xcconfig"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		97C146EB1CF9000F007C117D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4DBCA62D014709795822DAB3 /* Pods_Runner.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		115184DEBD90F46E3C4D6A22 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				27CF30F97FF60D18F1360EA1 /* Pods_Runner.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		2D951F078A379D06ED940BFD /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				261ED58A51B9E2B6CA1177DD /* Pods-Runner.debug.xcconfig */,
+				71108F9983B00BB797540912 /* Pods-Runner.release.xcconfig */,
+				AD1BEC149E15C97D748F2833 /* Pods-Runner.profile.xcconfig */,
+			);
+			name = Pods;
+			path = Pods;
+			sourceTree = "<group>";
+		};
+		9740EEB11CF90186004384FC /* Flutter */ = {
+			isa = PBXGroup;
+			children = (
+				3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */,
+				9740EEB21CF90195004384FC /* Debug.xcconfig */,
+				7AFA3C8E1D35360C0083082E /* Release.xcconfig */,
+				9740EEB31CF90195004384FC /* Generated.xcconfig */,
+			);
+			name = Flutter;
+			sourceTree = "<group>";
+		};
+		97C146E51CF9000F007C117D = {
+			isa = PBXGroup;
+			children = (
+				9740EEB11CF90186004384FC /* Flutter */,
+				97C146F01CF9000F007C117D /* Runner */,
+				97C146EF1CF9000F007C117D /* Products */,
+				2D951F078A379D06ED940BFD /* Pods */,
+				115184DEBD90F46E3C4D6A22 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		97C146EF1CF9000F007C117D /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				97C146EE1CF9000F007C117D /* Runner.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		97C146F01CF9000F007C117D /* Runner */ = {
+			isa = PBXGroup;
+			children = (
+				97C146FA1CF9000F007C117D /* Main.storyboard */,
+				97C146FD1CF9000F007C117D /* Assets.xcassets */,
+				97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */,
+				97C147021CF9000F007C117D /* Info.plist */,
+				1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */,
+				1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */,
+				74858FAE1ED2DC5600515810 /* AppDelegate.swift */,
+				74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */,
+			);
+			path = Runner;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+/* Begin PBXNativeTarget section */
+		97C146ED1CF9000F007C117D /* Runner */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 97C147051CF9000F007C117D /* Build configuration list for PBXNativeTarget "Runner" */;
+			buildPhases = (
+				D54C3A550544FA13F8D6A549 /* [CP] Check Pods Manifest.lock */,
+				9740EEB61CF901F6004384FC /* Run Script */,
+				97C146EA1CF9000F007C117D /* Sources */,
+				97C146EB1CF9000F007C117D /* Frameworks */,
+				97C146EC1CF9000F007C117D /* Resources */,
+				9705A1C41CF9048500538489 /* Embed Frameworks */,
+				3B06AD1E1E4923F5004D2608 /* Thin Binary */,
+				0F80B336CFEB84835F7EF261 /* [CP] Embed Pods Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Runner;
+			productName = Runner;
+			productReference = 97C146EE1CF9000F007C117D /* Runner.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+/* Begin PBXProject section */
+		97C146E61CF9000F007C117D /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 1300;
+				ORGANIZATIONNAME = "";
+				TargetAttributes = {
+					97C146ED1CF9000F007C117D = {
+						CreatedOnToolsVersion = 7.3.1;
+						LastSwiftMigration = 1100;
+					};
+				};
+			};
+			buildConfigurationList = 97C146E91CF9000F007C117D /* Build configuration list for PBXProject "Runner" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 97C146E51CF9000F007C117D;
+			productRefGroup = 97C146EF1CF9000F007C117D /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				97C146ED1CF9000F007C117D /* Runner */,
+			);
+		};
+/* End PBXProject section */
+/* Begin PBXResourcesBuildPhase section */
+		97C146EC1CF9000F007C117D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */,
+				3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */,
+				97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */,
+				97C146FC1CF9000F007C117D /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		0F80B336CFEB84835F7EF261 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		3B06AD1E1E4923F5004D2608 /* Thin Binary */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Thin Binary";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "/bin/sh \"$FLUTTER_ROOT/packages/flutter_tools/bin/xcode_backend.sh\" embed_and_thin";
+		};
+		9740EEB61CF901F6004384FC /* Run Script */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Run Script";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "/bin/sh \"$FLUTTER_ROOT/packages/flutter_tools/bin/xcode_backend.sh\" build";
+		};
+		D54C3A550544FA13F8D6A549 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-Runner-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		97C146EA1CF9000F007C117D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */,
+				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+/* Begin PBXVariantGroup section */
+		97C146FA1CF9000F007C117D /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				97C146FB1CF9000F007C117D /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				97C147001CF9000F007C117D /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+/* Begin XCBuildConfiguration section */
+		249021D3217E4FDB00AE95B9 /* Profile */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Profile;
+		};
+		249021D4217E4FDB00AE95B9 /* Profile */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7AFA3C8E1D35360C0083082E /* Release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+				ENABLE_BITCODE = NO;
+				INFOPLIST_FILE = Runner/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.toonflix;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
+				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = Profile;
+		};
+		97C147031CF9000F007C117D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		97C147041CF9000F007C117D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		97C147061CF9000F007C117D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9740EEB21CF90195004384FC /* Debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+				ENABLE_BITCODE = NO;
+				INFOPLIST_FILE = Runner/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.toonflix;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = Debug;
+		};
+		97C147071CF9000F007C117D /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7AFA3C8E1D35360C0083082E /* Release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+				ENABLE_BITCODE = NO;
+				INFOPLIST_FILE = Runner/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.toonflix;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
+				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+/* Begin XCConfigurationList section */
+		97C146E91CF9000F007C117D /* Build configuration list for PBXProject "Runner" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				97C147031CF9000F007C117D /* Debug */,
+				97C147041CF9000F007C117D /* Release */,
+				249021D3217E4FDB00AE95B9 /* Profile */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		97C147051CF9000F007C117D /* Build configuration list for PBXNativeTarget "Runner" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				97C147061CF9000F007C117D /* Debug */,
+				97C147071CF9000F007C117D /* Release */,
+				249021D4217E4FDB00AE95B9 /* Profile */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 97C146E61CF9000F007C117D /* Project object */;
+}
+
+6번 파일 ios/Runner.xcworkspace/contents.xcworkspacedata
+
+<?xml version="1.0" encoding="UTF-8"?>
+<Workspace
+   version = "1.0">
+   <FileRef
+      location = "group:Runner.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:Pods/Pods.xcodeproj">
+   </FileRef>
+</Workspace>
+
+
+
+7번 파일 ios/Runner/Info.plist
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>CFBundleDisplayName</key>
+	<string>Toonflix</string>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>toonflix</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(FLUTTER_BUILD_NAME)</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleVersion</key>
+	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>UILaunchStoryboardName</key>
+	<string>LaunchScreen</string>
+	<key>UIMainStoryboardFile</key>
+	<string>Main</string>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<false/>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
+	<key>UIApplicationSupportsIndirectInputEvents</key>
+	<true/>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>https</string>
+	</array>
+</dict>
+</plist>
+
+8번 파일   
+lib/screens/detail_screen.dart
+
+
+import 'package:flutter/material.dart';
+import 'package:toonflix/models/webtoon_detail_model.dart';
+import 'package:toonflix/models/webtoon_episode_model.dart';
+import 'package:toonflix/services/api_service.dart';
+import 'package:toonflix/widgets/episode_widget.dart';
+
+class DetailScreen extends StatefulWidget {
+  final String title, thumb, id;
+  const DetailScreen({
+    super.key,
+    required this.title,
+    required this.thumb,
+    required this.id,
+  });
+  @override
+  State<DetailScreen> createState() => _DetailScreenState();
+}
+class _DetailScreenState extends State<DetailScreen> {
+  late Future<WebtoonDetailModel> webtoon;
+  late Future<List<WebtoonEpisodeModel>> episodes;
+  @override
+  void initState() {
+    super.initState();
+    webtoon = ApiService.getToonById(widget.id);
+    episodes = ApiService.getLatestEpisodesById(widget.id);
+  }
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        elevation: 2,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.green,
+        title: Text(
+          widget.title,
+          style: const TextStyle(
+            fontSize: 24,
+          ),
+        ),
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(50),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Hero(
+                    tag: widget.id,
+                    child: Container(
+                      width: 250,
+                      clipBehavior: Clip.hardEdge,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(15),
+                        boxShadow: [
+                          BoxShadow(
+                            blurRadius: 15,
+                            offset: const Offset(10, 10),
+                            color: Colors.black.withOpacity(0.3),
+                          )
+                        ],
+                      ),
+                      child: Image.network(widget.thumb),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(
+                height: 25,
+              ),
+              FutureBuilder(
+                future: webtoon,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          snapshot.data!.about,
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                        const SizedBox(
+                          height: 15,
+                        ),
+                        Text(
+                          '${snapshot.data!.genre} / ${snapshot.data!.age}',
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                      ],
+                    );
+                  }
+                  return const Text("...");
+                },
+              ),
+              const SizedBox(
+                height: 25,
+              ),
+              FutureBuilder(
+                future: episodes,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return Column(
+                      children: [
+                        for (var episode in snapshot.data!)
+                          Container(
+                            margin: const EdgeInsets.only(bottom: 10),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              color: Colors.green.shade400,
+                              boxShadow: [
+                                BoxShadow(
+                                  blurRadius: 5,
+                                  offset: const Offset(5, 5),
+                                  color: Colors.black.withOpacity(0.1),
+                                ),
+                              ],
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 10,
+                                horizontal: 20,
+                              ),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    episode.title,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                  const Icon(
+                                    Icons.chevron_right_rounded,
+                                    color: Colors.white,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          Episode(
+                            episode: episode,
+                            webtoonId: widget.id,
+                          )
+                      ],
+                    );
+                  }
+                  return Container();
+                },
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+9번 파일  
+lib/widgets/episode_widget.dart
+
+import 'package:flutter/material.dart';
+import 'package:toonflix/models/webtoon_episode_model.dart';
+import 'package:url_launcher/url_launcher_string.dart';
+
+class Episode extends StatelessWidget {
+  const Episode({
+    Key? key,
+    required this.episode,
+    required this.webtoonId,
+  }) : super(key: key);
+
+  final String webtoonId;
+  final WebtoonEpisodeModel episode;
+
+  onButtonTap() async {
+    await launchUrlString(
+        "https://comic.naver.com/webtoon/detail?titleId=$webtoonId&no=${episode.id}");
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onButtonTap,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          color: Colors.green.shade400,
+          boxShadow: [
+            BoxShadow(
+              blurRadius: 2,
+              offset: const Offset(2, 2),
+              color: Colors.black.withOpacity(0.1),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            vertical: 10,
+            horizontal: 20,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                episode.title,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                ),
+              ),
+              const Icon(
+                Icons.chevron_right_rounded,
+                color: Colors.white,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+10번 파일
+ 
+linux/flutter/generated_plugin_registrant.cc
+
+//
+//  Generated file. Do not edit.
+//
+// clang-format off
+
+#include "generated_plugin_registrant.h"
+
+#include <url_launcher_linux/url_launcher_plugin.h>
+
+void fl_register_plugins(FlPluginRegistry* registry) {
+  g_autoptr(FlPluginRegistrar) url_launcher_linux_registrar =
+      fl_plugin_registry_get_registrar_for_plugin(registry, "UrlLauncherPlugin");
+  url_launcher_plugin_register_with_registrar(url_launcher_linux_registrar);
+}
+
+11번 파일 linux/flutter/generated_plugins.cmake
+
+#
+# Generated file, do not edit.
+#
+
+list(APPEND FLUTTER_PLUGIN_LIST
+  url_launcher_linux
+)
+
+list(APPEND FLUTTER_FFI_PLUGIN_LIST
+)
+set(PLUGIN_BUNDLED_LIBRARIES)
+foreach(plugin ${FLUTTER_PLUGIN_LIST})
+  add_subdirectory(flutter/ephemeral/.plugin_symlinks/${plugin}/linux plugins/${plugin})
+  target_link_libraries(${BINARY_NAME} PRIVATE ${plugin}_plugin)
+  list(APPEND PLUGIN_BUNDLED_LIBRARIES $<TARGET_FILE:${plugin}_plugin>)
+  list(APPEND PLUGIN_BUNDLED_LIBRARIES ${${plugin}_bundled_libraries})
+endforeach(plugin)
+foreach(ffi_plugin ${FLUTTER_FFI_PLUGIN_LIST})
+  add_subdirectory(flutter/ephemeral/.plugin_symlinks/${ffi_plugin}/linux plugins/${ffi_plugin})
+  list(APPEND PLUGIN_BUNDLED_LIBRARIES ${${ffi_plugin}_bundled_libraries})
+endforeach(ffi_plugin)
+
+12번 파일  macos/Flutter/Flutter-Debug.xcconfig
+#include? "Pods/Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig"
+#include "ephemeral/Flutter-Generated.xcconfig"
+
+13번 파일  macos/Flutter/Flutter-Release.xcconfig
+#include? "Pods/Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"
+#include "ephemeral/Flutter-Generated.xcconfig"
+
+14번 파일   macos/Flutter/GeneratedPluginRegistrant.swift
+
+//
+//  Generated file. Do not edit.
+//
+import FlutterMacOS
+import Foundation
+
+import url_launcher_macos
+
+func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
+  UrlLauncherPlugin.register(with: registry.registrar(forPlugin: "UrlLauncherPlugin"))
+}
+
+15번 파일   macos/Podfile
+platform :osx, '10.11'
+
+# CocoaPods analytics sends network stats synchronously affecting flutter build latency.
+ENV['COCOAPODS_DISABLE_STATS'] = 'true'
+
+project 'Runner', {
+  'Debug' => :debug,
+  'Profile' => :release,
+  'Release' => :release,
+}
+
+def flutter_root
+  generated_xcode_build_settings_path = File.expand_path(File.join('..', 'Flutter', 'ephemeral', 'Flutter-Generated.xcconfig'), __FILE__)
+  unless File.exist?(generated_xcode_build_settings_path)
+    raise "#{generated_xcode_build_settings_path} must exist. If you're running pod install manually, make sure \"flutter pub get\" is executed first"
+  end
+
+  File.foreach(generated_xcode_build_settings_path) do |line|
+    matches = line.match(/FLUTTER_ROOT\=(.*)/)
+    return matches[1].strip if matches
+  end
+  raise "FLUTTER_ROOT not found in #{generated_xcode_build_settings_path}. Try deleting Flutter-Generated.xcconfig, then run \"flutter pub get\""
+end
+
+require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelper'), flutter_root)
+
+flutter_macos_podfile_setup
+
+target 'Runner' do
+  use_frameworks!
+  use_modular_headers!
+
+  flutter_install_all_macos_pods File.dirname(File.realpath(__FILE__))
+end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    flutter_additional_macos_build_settings(target)
+  end
+end
+
+16번 파일 pubspec.lock
+# Generated by pub
+# See https://dart.dev/tools/pub/glossary#lockfile
+packages:
+  async:
+    dependency: transitive
+    description:
+      name: async
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.9.0"
+  boolean_selector:
+    dependency: transitive
+    description:
+      name: boolean_selector
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.1.0"
+  characters:
+    dependency: transitive
+    description:
+      name: characters
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.2.1"
+  clock:
+    dependency: transitive
+    description:
+      name: clock
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.1.1"
+  collection:
+    dependency: transitive
+    description:
+      name: collection
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.16.0"
+  cupertino_icons:
+    dependency: "direct main"
+    description:
+      name: cupertino_icons
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.5"
+  fake_async:
+    dependency: transitive
+    description:
+      name: fake_async
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.3.1"
+  flutter:
+    dependency: "direct main"
+    description: flutter
+    source: sdk
+    version: "0.0.0"
+  flutter_lints:
+    dependency: "direct dev"
+    description:
+      name: flutter_lints
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.1"
+  flutter_test:
+    dependency: "direct dev"
+    description: flutter
+    source: sdk
+    version: "0.0.0"
+  flutter_web_plugins:
+    dependency: transitive
+    description: flutter
+    source: sdk
+    version: "0.0.0"
+  http:
+    dependency: "direct main"
+    description:
+      name: http
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.13.5"
+  http_parser:
+    dependency: transitive
+    description:
+      name: http_parser
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "4.0.2"
+  js:
+    dependency: transitive
+    description:
+      name: js
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.6.4"
+  lints:
+    dependency: transitive
+    description:
+      name: lints
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.1"
+  matcher:
+    dependency: transitive
+    description:
+      name: matcher
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.12.12"
+  material_color_utilities:
+    dependency: transitive
+    description:
+      name: material_color_utilities
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.5"
+  meta:
+    dependency: transitive
+    description:
+      name: meta
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.8.0"
+  path:
+    dependency: transitive
+    description:
+      name: path
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.8.2"
+  plugin_platform_interface:
+    dependency: transitive
+    description:
+      name: plugin_platform_interface
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.1.3"
+  sky_engine:
+    dependency: transitive
+    description: flutter
+    source: sdk
+    version: "0.0.99"
+  source_span:
+    dependency: transitive
+    description:
+      name: source_span
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.9.0"
+  stack_trace:
+    dependency: transitive
+    description:
+      name: stack_trace
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.10.0"
+  stream_channel:
+    dependency: transitive
+    description:
+      name: stream_channel
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.1.0"
+  string_scanner:
+    dependency: transitive
+    description:
+      name: string_scanner
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.1.1"
+  term_glyph:
+    dependency: transitive
+    description:
+      name: term_glyph
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.2.1"
+  test_api:
+    dependency: transitive
+    description:
+      name: test_api
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.4.12"
+  typed_data:
+    dependency: transitive
+    description:
+      name: typed_data
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.3.1"
+  url_launcher:
+    dependency: "direct main"
+    description:
+      name: url_launcher
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "6.1.7"
+  url_launcher_android:
+    dependency: transitive
+    description:
+      name: url_launcher_android
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "6.0.22"
+  url_launcher_ios:
+    dependency: transitive
+    description:
+      name: url_launcher_ios
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "6.0.17"
+  url_launcher_linux:
+    dependency: transitive
+    description:
+      name: url_launcher_linux
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.0.1"
+  url_launcher_macos:
+    dependency: transitive
+    description:
+      name: url_launcher_macos
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.0.1"
+  url_launcher_platform_interface:
+    dependency: transitive
+    description:
+      name: url_launcher_platform_interface
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.1.1"
+  url_launcher_web:
+    dependency: transitive
+    description:
+      name: url_launcher_web
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.13"
+  url_launcher_windows:
+    dependency: transitive
+    description:
+      name: url_launcher_windows
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.0.1"
+  vector_math:
+    dependency: transitive
+    description:
+      name: vector_math
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.1.2"
+sdks:
+  dart: ">=2.18.4 <3.0.0"
+  flutter: ">=2.10.0"
+
+17번 파일   pubspec.yaml
+
+name: toonflix
+description: A new Flutter project.
+# The following line prevents the package from being accidentally published to
+# pub.dev using `flutter pub publish`. This is preferred for private packages.
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
+# The following defines the version and build number for your application.
+# A version number is three numbers separated by dots, like 1.2.43
+# followed by an optional build number separated by a +.
+# Both the version and the builder number may be overridden in flutter
+# build by specifying --build-name and --build-number, respectively.
+# In Android, build-name is used as versionName while build-number used as versionCode.
+# Read more about Android versioning at https://developer.android.com/studio/publish/versioning
+# In iOS, build-name is used as CFBundleShortVersionString while build-number is used as CFBundleVersion.
+# Read more about iOS versioning at
+# https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
+# In Windows, build-name is used as the major, minor, and patch parts
+# of the product and file versions while build-number is used as the build suffix.
+version: 1.0.0+1
+environment:
+  sdk: ">=2.18.4 <3.0.0"
+# Dependencies specify other packages that your package needs in order to work.
+# To automatically upgrade your package dependencies to the latest versions
+# consider running `flutter pub upgrade --major-versions`. Alternatively,
+# dependencies can be manually updated by changing the version numbers below to
+# the latest version available on pub.dev. To see which dependencies have newer
+# versions available, run `flutter pub outdated`.
+dependencies:
+  flutter:
+    sdk: flutter
+  http: ^0.13.5
+  # The following adds the Cupertino Icons font to your application.
+  # Use with the CupertinoIcons class for iOS style icons.
+  cupertino_icons: ^1.0.2
+  url_launcher: ^6.1.7
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  # The "flutter_lints" package below contains a set of recommended lints to
+  # encourage good coding practices. The lint set provided by the package is
+  # activated in the `analysis_options.yaml` file located at the root of your
+  # package. See that file for information about deactivating specific lint
+  # rules and activating additional ones.
+  flutter_lints: ^2.0.0
+# For information on the generic Dart part of this file, see the
+# following page: https://dart.dev/tools/pub/pubspec
+# The following section is specific to Flutter packages. 
+flutter:
+  # The following line ensures that the Material Icons font is
+  # included with your application, so that you can use the icons in
+  # the material Icons class.
+  uses-material-design: true
+  # To add assets to your application, add an assets section, like this:
+  # assets:
+  #   - images/a_dot_burr.jpeg
+  #   - images/a_dot_ham.jpeg
+  # An image asset can refer to one or more resolution-specific "variants", see
+  # https://flutter.dev/assets-and-images/#resolution-aware
+  # For details regarding adding assets from package dependencies, see
+  # https://flutter.dev/assets-and-images/#from-packages
+  # To add custom fonts to your application, add a fonts section here,
+  # in this "flutter" section. Each entry in this list should have a
+  # "family" key with the font family name, and a "fonts" key with a
+  # list giving the asset and other descriptors for the font. For
+  # example:
+  # fonts:
+  #   - family: Schyler
+  #     fonts:
+  #       - asset: fonts/Schyler-Regular.ttf
+  #       - asset: fonts/Schyler-Italic.ttf
+  #         style: italic
+  #   - family: Trajan Pro
+  #     fonts:
+  #       - asset: fonts/TrajanPro.ttf
+  #       - asset: fonts/TrajanPro_Bold.ttf
+  #         weight: 700
+  #
+  # For details regarding fonts from package dependencies,
+  # see https://flutter.dev/custom-fonts/#from-packages
+
+18번 파일 windows/flutter/generated_plugin_registrant.cc
+
+//
+//  Generated file. Do not edit.
+//
+// clang-format off
+
+#include "generated_plugin_registrant.h"
+
+#include <url_launcher_windows/url_launcher_windows.h>
+
+void RegisterPlugins(flutter::PluginRegistry* registry) {
+  UrlLauncherWindowsRegisterWithRegistrar(
+      registry->GetRegistrarForPlugin("UrlLauncherWindows"));
+}
+
+19번 파일 windows/flutter/generated_plugins.cmake
+
+#
+# Generated file, do not edit.
+#
+
+list(APPEND FLUTTER_PLUGIN_LIST
+  url_launcher_windows
+)
+
+list(APPEND FLUTTER_FFI_PLUGIN_LIST
+)
+set(PLUGIN_BUNDLED_LIBRARIES)
+foreach(plugin ${FLUTTER_PLUGIN_LIST})
+  add_subdirectory(flutter/ephemeral/.plugin_symlinks/${plugin}/windows plugins/${plugin})
+  target_link_libraries(${BINARY_NAME} PRIVATE ${plugin}_plugin)
+  list(APPEND PLUGIN_BUNDLED_LIBRARIES $<TARGET_FILE:${plugin}_plugin>)
+  list(APPEND PLUGIN_BUNDLED_LIBRARIES ${${plugin}_bundled_libraries})
+endforeach(plugin)
+foreach(ffi_plugin ${FLUTTER_FFI_PLUGIN_LIST})
+  add_subdirectory(flutter/ephemeral/.plugin_symlinks/${ffi_plugin}/windows plugins/${ffi_plugin})
+  list(APPEND PLUGIN_BUNDLED_LIBRARIES ${${ffi_plugin}_bundled_libraries})
+endforeach(ffi_plugin)
+
+
+
+
+
+## 6.18 Thank You
